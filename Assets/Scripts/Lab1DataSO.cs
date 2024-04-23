@@ -32,13 +32,13 @@ public class Lab1DataSO : ScriptableObject
         public float std_dev;
         [Header("Построение графиков")]
         [Header("Количество итераций на одном наборе параметров")]
-        public float iterAmount;
+        public int iterAmount;
         [Header("Изменять параметры")]
         public float from;
         public float to;
         public float step;
         [Header("Количество заданий для остановки")]
-        public float k;
+        public int k;
         [Header("Исследуемое значение")]
         public InvestigatedValue investigatedValue;
         [Header("График зависит от параметра:")]
