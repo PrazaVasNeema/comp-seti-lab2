@@ -5,7 +5,16 @@ using UnityEngine;
 
 public class Lab1 : MonoBehaviour
 {
-    [SerializeField] private Lab1DataSO.Data m_labData;
+    public class ChartData
+    {
+        public float x;
+        public float y;
+    }
+
+    [SerializeField] private ChartView m_ChartView;
+    
+    [SerializeField] private Lab1DataSO m_labDataSO;
+    private Lab1DataSO.Data m_labData => m_labDataSO.data;
     // [SerializeField] private int m_serverCores;
     [SerializeField] private int m_qMaxSize;
     
@@ -15,7 +24,9 @@ public class Lab1 : MonoBehaviour
         float Bx;
         float dependencyParamDefValue = GetDependencyValue(m_labData.dependencyValue);
 
-        float[] valuesArray = new float[(int) ((m_labData.to - m_labData.from) / m_labData.step)];
+        int totalIters = (int)((m_labData.to - m_labData.from) / m_labData.step) + 2;
+        List<ChartData> chartDataList = new List<ChartData>();
+        // Debug.Log($"valuesLength: {(int) ((m_labData.to - m_labData.from) / m_labData.step)}");
 
         int arrayIter = -1;
         for (float i = m_labData.from; i <= m_labData.to; i += m_labData.step)
@@ -82,17 +93,26 @@ public class Lab1 : MonoBehaviour
 
             }
 
-            sumIters /= valuesArray.Length;
-            valuesArray[arrayIter] = sumIters;
+            sumIters /= m_labData.iterAmount;
+
+            ChartData newChartData = new ChartData();
+            newChartData.x = i;
+            newChartData.y = sumIters;
+            chartDataList.Add(newChartData);
 
         }
 
         SetDependencyValue(m_labData.dependencyValue, dependencyParamDefValue);
 
-        foreach (var value in valuesArray)
-        {
-            Debug.Log($"P_Prostoi: {value}");
-        }
+        // foreach (var value in valuesArray)
+        // {
+        //     Debug.Log($"P_Prostoi: {value}");
+        // }
+        
+        m_ChartView.UpdateChart(chartDataList);
+        
+        Debug.Log(chartDataList.Count);
+        
     }
 
     private void SetDependencyValue(Lab1DataSO.DependencyValue lab1DDependencyValue, float value)
