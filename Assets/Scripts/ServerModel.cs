@@ -104,61 +104,71 @@ public class ServerModel : MonoBehaviour
     // [SerializeField] private int m_serverCores;
     [SerializeField] private int m_qMaxSize;
     
-    // public void Calculate()
-    // {
-    //     float Ax;
-    //     float Bx;
-    //     float dependencyParamDefValue = GetDependencyValue(m_labData.dependencyValue);
-    //
-    //     int totalIters = (int)((m_labData.to - m_labData.from) / m_labData.step) + 2;
-    //     List<ChartData> chartDataList = new List<ChartData>();
-    //     // Debug.Log($"valuesLength: {(int) ((m_labData.to - m_labData.from) / m_labData.step)}");
-    //
-    //     int arrayIter = -1;
-    //     for (float i = m_labData.from; i <= m_labData.to; i += m_labData.step)
-    //     {
-    //         arrayIter++;
-    //         SetDependencyValue(m_labData.dependencyValue, i);
-    //
-    //         float sumIters = 0;
-    //         for (int j = 0; j <= m_labData.iterAmount; j++)
-    //         {
-    //             float sumTasks = 0;
-    //             
-    //
-    //             float P_Prostoi = 0;
-    //
-    //             //////
-    //             
-    //
-    //             // sumTasks /= m_labData.k;
-    //
-    //             sumTasks = P_Prostoi / serverTimer;
-    //             sumIters += sumTasks;
-    //
-    //         }
-    //
-    //         sumIters /= m_labData.iterAmount;
-    //
-    //         ChartData newChartData = new ChartData();
-    //         newChartData.x = i;
-    //         newChartData.y = sumIters;
-    //         chartDataList.Add(newChartData);
-    //
-    //     }
-    //
-    //     SetDependencyValue(m_labData.dependencyValue, dependencyParamDefValue);
-    //
-    //     // foreach (var value in valuesArray)
-    //     // {
-    //     //     Debug.Log($"P_Prostoi: {value}");
-    //     // }
-    //     
-    //     m_ChartView.UpdateChart(chartDataList);
-    //     
-    //     Debug.Log(chartDataList.Count);
-    //     
-    // }
+    public void Calculate()
+    {
+        float dependencyParamDefValue = GetDependencyValue(m_labData.dependencyValue);
+    
+        int totalIters = (int)((m_labData.to - m_labData.from) / m_labData.step) + 2;
+        List<InvestigatePieceAbstract> investigatePiecesList = new List<InvestigatePieceAbstract>();
+        investigatePiecesList.Add(new InvestigateErland5D());
+        
+        
+        // Debug.Log($"valuesLength: {(int) ((m_labData.to - m_labData.from) / m_labData.step)}");
+    
+        int arrayIter = -1;
+        for (float i = m_labData.from; i <= m_labData.to; i += m_labData.step)
+        {
+            arrayIter++;
+            SetDependencyValue(m_labData.dependencyValue, i);
+    
+            float sumIters = 0;
+            for (int j = 0; j <= m_labData.iterAmount; j++)
+            {
+    
+                //////
+
+                var serverLog = ImitateServer();
+                
+                if(serverLog == null)
+                    return;
+                
+                foreach (var investigatePiece in investigatePiecesList)
+                {
+                    investigatePiece.InvestigateOne(serverLog);
+                }
+    
+                // sumTasks /= m_labData.k;
+    
+    
+            }
+
+            foreach (var investigatePiece in investigatePiecesList)
+            {
+                investigatePiece.InvestigateTwo(m_labData.iterAmount, i);
+            }
+            
+    
+        }
+
+        foreach (var investigatePiece in investigatePiecesList)
+        {
+            var chartData = investigatePiece.InvestigateFinal(m_labData.dependencyValue);
+            
+            GameEvents.OnBuildChart?.Invoke(chartData);
+        }
+    
+        SetDependencyValue(m_labData.dependencyValue, dependencyParamDefValue);
+    
+        // foreach (var value in valuesArray)
+        // {
+        //     Debug.Log($"P_Prostoi: {value}");
+        // }
+        
+        // m_ChartView.UpdateChart(chartDataList);
+        
+        // Debug.Log(chartDataList.Count);
+        
+    }
 
     public void ImitateServerActivity()
     {
@@ -171,9 +181,11 @@ public class ServerModel : MonoBehaviour
         
         var chartData = new InvestigatePieceAbstract.ChartData();
         chartData.xAxisName = Lab1DataSO.DependencyValue.justTime;
+        chartData.targetChart = InvestigatePieceAbstract.TargetChart.ServerActivity;
 
         foreach (var log in serverLogList)
         {
+            Debug.Log(" ---------------------- SERVER LOG START ---------------------- ");
             Debug.Log($"TIP: {log.TIP}, serverTime: {log.serverTime}, serverIsBusy: {log.serverIsBusy}, qBuffer: {log.qBuffer.bufferCount}, curTask: {log.curTask}, Ax: {log.AxValue}, Bx: {log.BxValue}");
             if (Equals(log.TIP, ServerLog.EventType.T1))
             {
@@ -203,6 +215,8 @@ public class ServerModel : MonoBehaviour
 
         var serverLogList = new List<ServerLog>();
         // var curServerLog = new ServerLog();
+
+        int totalIters = 0;
         
         
         while (compTasksCount < m_labData.k)
@@ -273,7 +287,9 @@ public class ServerModel : MonoBehaviour
             curServerLog.SetValues(TIP, serverTime, serverIsBusy, qBuffer.Clone(), curProcessedTask, Ax, Bx);
             serverLogList.Add(curServerLog);
 
-            if (totalTasksCount > 1000000)
+
+            totalIters++;
+            if (totalIters > 1000000)
             {
                 Debug.LogError("Infinite loop occured");
                 return null;

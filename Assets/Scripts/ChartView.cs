@@ -13,7 +13,7 @@ public class ChartView : MonoBehaviour
 
     private SerieData m_defaultSerieData;
 
-    [SerializeField] private Lab1DataSO.DependencyValue m_chartType;
+    [SerializeField] private InvestigatePieceAbstract.TargetChart m_chartType;
     // [SerializeField] private TMP_Text m_dependencyValueText;
 
 
@@ -43,8 +43,7 @@ public class ChartView : MonoBehaviour
 
     private void UpdateChart(InvestigatePieceAbstract.ChartData chartData)
     {
-        Debug.Log("Test");
-        if(!Equals(chartData.xAxisName, m_chartType))
+        if(!Equals(chartData.targetChart, m_chartType))
             return;
         
         // m_dependencyValueText.text = chartData.xAxisName.ToString();
