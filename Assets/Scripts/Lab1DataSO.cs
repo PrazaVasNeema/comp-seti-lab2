@@ -15,7 +15,8 @@ public class Lab1DataSO : ScriptableObject
         lambda,
         D,
         mean,
-        std_dev
+        std_dev,
+        justTime
     }
     [SerializeField] private Data m_data;
     public Data data => m_data;
