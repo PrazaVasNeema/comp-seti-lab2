@@ -16,23 +16,86 @@ public class ServerModel : MonoBehaviour
         public EventType TIP;
         public float serverTime;
         public bool serverIsBusy;
-        public int QSize;
+        public QBuffer qBuffer;
         public int curTask;
         public float AxValue;
         public float BxValue;
 
-        public void SetValues(EventType TTP, float serverTime, bool serverIsBusy, int QSize, int curTask, float AxValue,
+        public void SetValues(EventType TIP, float serverTime, bool serverIsBusy, QBuffer qBuffer, int curTask, float AxValue,
             float BxValue)
         {
             this.TIP = TIP;
             this.serverTime = serverTime;
             this.serverIsBusy = serverIsBusy;
-            this.QSize = QSize;
-            this.curTask = this.curTask;
+            this.qBuffer = qBuffer;
+            this.curTask = curTask;
             this.AxValue = AxValue;
             this.BxValue = BxValue;
         }
     }
+    
+    public class QBuffer
+    {
+        public class QContent
+        {
+            public int taskNum;
+            public float arrivalTime;
+        }
+        
+        private List<QContent> qContentsList = new List<QContent>();
+        private int currentIndex = 0;
+        
+        public int bufferCount => qContentsList.Count;
+        
+        public QContent RemoveTask(int taskNum)
+        {
+            var output = qContentsList.Find(x => x.taskNum == taskNum);
+            qContentsList.RemoveAll(x => x.taskNum == taskNum);
+
+            return output;
+        }
+        
+        public QContent RemoveTaskByIndex(int index)
+        {
+            if (index < 0 || index >= qContentsList.Count)
+                return null;
+            
+            var output = qContentsList[index];
+            qContentsList.RemoveAt(index);
+
+            return output;
+        }
+        
+        // Реализуй выбор элемента из списка qContentsList, использующий RoundRobin
+
+        public QContent GetTaskRoundRobin()
+        {
+            if (qContentsList.Count == 0)
+                return null;
+            
+            currentIndex = ++currentIndex % qContentsList.Count;
+
+            return RemoveTaskByIndex(currentIndex);
+        }
+        
+        public void AddTask(QContent qContent)
+        {
+            qContentsList.Add(qContent);
+        }
+        
+        // Method to clone data into another instance of that class
+        public QBuffer Clone()
+        {
+            QBuffer newQBuffer = new QBuffer();
+            newQBuffer.qContentsList = new List<QContent>(qContentsList);
+            newQBuffer.currentIndex = currentIndex;
+
+            return newQBuffer;
+        }
+        
+    }
+
+
 
     [SerializeField] private ChartView m_ChartView;
     
@@ -100,14 +163,21 @@ public class ServerModel : MonoBehaviour
     public void ImitateServerActivity()
     {
         var serverLogList = ImitateServer();
+
+        if (serverLogList == null)
+        {
+            return;
+        }
+        
         var chartData = new InvestigatePieceAbstract.ChartData();
         chartData.xAxisName = Lab1DataSO.DependencyValue.justTime;
 
         foreach (var log in serverLogList)
         {
+            Debug.Log($"TIP: {log.TIP}, serverTime: {log.serverTime}, serverIsBusy: {log.serverIsBusy}, qBuffer: {log.qBuffer.bufferCount}, curTask: {log.curTask}, Ax: {log.AxValue}, Bx: {log.BxValue}");
             if (Equals(log.TIP, ServerLog.EventType.T1))
             {
-                var point = new InvestigatePieceAbstract.ChartData.Points(log.serverTime, log.QSize);
+                var point = new InvestigatePieceAbstract.ChartData.Points(log.serverTime, log.qBuffer.bufferCount + (log.serverIsBusy ? 1 : 0));
                 chartData.pointsList.Add(point);
             }
         }
@@ -121,36 +191,55 @@ public class ServerModel : MonoBehaviour
         float T1 = 0;
         float T2 = 0;
         bool serverIsBusy = false;
-        int QSize = 0;
-        int curTask = 0;
+        QBuffer qBuffer = new QBuffer();
+        int compTasksCount = 0;
+        int totalTasksCount = 0;
 
         System.Random rng = new System.Random();
         float Ax;
         float Bx;
         ServerLog.EventType TIP = ServerLog.EventType.T1;
+        int curProcessedTask = -1;
 
         var serverLogList = new List<ServerLog>();
-        var curServerLog = new ServerLog();
+        // var curServerLog = new ServerLog();
         
-        while (curTask < m_labData.k)
+        
+        while (compTasksCount < m_labData.k)
         {
-            Ax = 0f;
-            Bx = 0f;
+            Ax = 0f;  
+            Bx = 0f; 
             if (T1 < T2 || T1 == 0)
             {
                 serverTime = T1;
-                Ax = (float) ProbDistFuncModel.GenerateErlang(rng, 5, m_labData.lambda);
+                Ax = (float) ProbDistFuncModel.GenerateErlang(rng, 5, m_labData.lambda, m_labData.D);
                 T1 += Ax;
+
+                totalTasksCount++;
 
                 if (!serverIsBusy)
                 {
                     serverIsBusy = true;
                     Bx = (float)ProbDistFuncModel.GenerateNormal(rng, m_labData.mean, m_labData.std_dev);
                     T2 = serverTime + Bx;
+
+                    curProcessedTask = totalTasksCount;
                 }
                 else
                 {
-                    QSize += Math.Min(QSize+1, m_qMaxSize);
+                    if (qBuffer.bufferCount < m_qMaxSize)
+                    {
+                        var qContent = new QBuffer.QContent
+                        {
+                            taskNum = totalTasksCount,
+                            arrivalTime = serverTime
+                        };
+                        qBuffer.AddTask(qContent);
+                    }
+                    else
+                    {
+                        Debug.Log("Buffer is full");
+                    }
                 }
 
                 TIP = ServerLog.EventType.T1;
@@ -160,24 +249,40 @@ public class ServerModel : MonoBehaviour
                 serverTime = T2;
                 Bx = (float)ProbDistFuncModel.GenerateNormal(rng, m_labData.mean, m_labData.std_dev);
                 
-                if (QSize == 0)
+                if (qBuffer.bufferCount == 0)
                 {
                     serverIsBusy = false;
                     T2 = T1 + Bx;
+                    curProcessedTask = -1;
                 }
-                else if (QSize > 0)
+                else if (qBuffer.bufferCount > 0)
                 {
-                    QSize--;
+                    var newTaskFromBuffer = qBuffer.GetTaskRoundRobin();
+                    curProcessedTask = newTaskFromBuffer.taskNum;
                     T2 = serverTime + Bx;
                 }
                 
+                
+                
                 TIP = ServerLog.EventType.T2;
+                compTasksCount++;
+            }
+            // Debug.Log($"1: TIP: {TIP}, serverTime: {serverTime}, serverIsBusy: {serverIsBusy}, qBuffer: {qBuffer.bufferCount}, curTask: {curProcessedTask}, Ax: {Ax}, Bx: {Bx}");
+
+            var curServerLog = new ServerLog();
+            curServerLog.SetValues(TIP, serverTime, serverIsBusy, qBuffer.Clone(), curProcessedTask, Ax, Bx);
+            serverLogList.Add(curServerLog);
+
+            if (totalTasksCount > 1000000)
+            {
+                Debug.LogError("Infinite loop occured");
+                return null;
             }
 
-            curServerLog.SetValues(TIP, serverTime, serverIsBusy, QSize, curTask, Ax, Bx);
-            serverLogList.Add(curServerLog);
         }
 
+        Debug.Log(serverLogList);
+        
         return serverLogList;
     }
 

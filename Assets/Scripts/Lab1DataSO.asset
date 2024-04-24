@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: Lab1DataSO
   m_EditorClassIdentifier: 
   m_data:
-    lambda: 2.999999
+    lambda: 10
     D: 1
-    mean: 0
-    std_dev: 1
+    mean: 1
+    std_dev: 10
     iterAmount: 1000
     from: 0.1
     to: 0.5

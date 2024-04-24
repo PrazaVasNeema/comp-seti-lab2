@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class GameEvents
+public class GameEvents : MonoBehaviour
 {
     public static System.Action<InvestigatePieceAbstract.ChartData> OnBuildChart;
 }

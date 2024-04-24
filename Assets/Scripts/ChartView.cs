@@ -43,6 +43,7 @@ public class ChartView : MonoBehaviour
 
     private void UpdateChart(InvestigatePieceAbstract.ChartData chartData)
     {
+        Debug.Log("Test");
         if(!Equals(chartData.xAxisName, m_chartType))
             return;
         

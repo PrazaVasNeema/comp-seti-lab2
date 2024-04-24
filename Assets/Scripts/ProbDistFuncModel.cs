@@ -26,13 +26,13 @@ public static class ProbDistFuncModel
         return -Math.Log(uniform) / lambda;
     }
     
-    public static double GenerateErlang(System.Random rng, int k, double lambda)
+    public static double GenerateErlang(System.Random rng, int k, double lambda, double D)
     {
         double erlang = 0.0;
         for (int i = 0; i < k; i++)
         {
             erlang += GenerateExponential(rng, lambda);
         }
-        return erlang;
+        return erlang + D;
     }
 }

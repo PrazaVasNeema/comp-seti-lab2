@@ -18,7 +18,7 @@ public abstract class InvestigatePieceAbstract : MonoBehaviour
             }
         }
 
-        public List<Points> pointsList;
+        public List<Points> pointsList = new List<Points>();
         public Lab1DataSO.DependencyValue xAxisName;
     }
 
