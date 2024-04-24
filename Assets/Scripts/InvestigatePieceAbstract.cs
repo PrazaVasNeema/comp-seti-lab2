@@ -39,7 +39,10 @@ public abstract class InvestigatePieceAbstract
 
     public virtual void InvestigateTwo(int itersCount, float x)
     {
-        investigatedValueTempSum /= itersCount;
+        investigatedValueTempSum /= itersCount + 1;
+        
+        // if(chartData.targetChart == TargetChart.P_prostoi)
+        //     Debug.Log("INVESTIGATEEEEEE: " + investigatedValueTempSum);
         
         chartData.pointsList.Add(new ChartData.Points(x, investigatedValueTempSum));
     }

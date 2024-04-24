@@ -113,6 +113,7 @@ public class ServerModel : MonoBehaviour
         
         investigatePiecesList.Add(new InvestigateErland5D());
         investigatePiecesList.Add(new InvestigateAbsGauss());
+        investigatePiecesList.Add(new InvestigatePProstoi());
 
         
         
@@ -125,7 +126,8 @@ public class ServerModel : MonoBehaviour
             SetDependencyValue(m_labData.dependencyValue, i);
     
             float sumIters = 0;
-            for (int j = 0; j <= m_labData.iterAmount; j++)
+            int iterTest = 0;
+            for (int j = 0; j < m_labData.iterAmount; j++)
             {
     
                 //////
@@ -144,13 +146,13 @@ public class ServerModel : MonoBehaviour
                 }
     
                 // sumTasks /= m_labData.k;
-    
-    
+                iterTest++;
+
             }
 
             foreach (var investigatePiece in investigatePiecesList)
             {
-                investigatePiece.InvestigateTwo(m_labData.iterAmount, i);
+                investigatePiece.InvestigateTwo(iterTest, i);
             }
             
     
@@ -225,6 +227,13 @@ public class ServerModel : MonoBehaviour
         // var curServerLog = new ServerLog();
 
         int totalIters = 0;
+
+        int AxCounter = 0;
+        int BxCounter = 0;
+        float totalWaitingTime = 0;
+        float totalProcessedTime = 0;
+        float Mtau = 0;
+        float Msigma = 0;
         
         
         while (compTasksCount < m_labData.k)
@@ -260,13 +269,13 @@ public class ServerModel : MonoBehaviour
                     }
                     else
                     {
-                        Debug.Log("Buffer is full");
+                        // Debug.Log("Buffer is full");
                     }
                 }
 
                 TIP = ServerLog.EventType.T1;
             }
-            else if (T1 > T2)
+            else
             {
                 serverTime = T2;
                 Bx = (float)ProbDistFuncModel.GenerateNormal(rng, m_labData.mean, m_labData.std_dev);
@@ -295,17 +304,36 @@ public class ServerModel : MonoBehaviour
             curServerLog.SetValues(TIP, serverTime, serverIsBusy, qBuffer.Clone(), curProcessedTask, Ax, Bx);
             serverLogList.Add(curServerLog);
 
-
-            totalIters++;
-            if (totalIters > 100000000)
+            if (Ax > 0)
             {
-                Debug.LogError("Infinite loop occured");
-                return null;
+                totalWaitingTime += Ax;
+                AxCounter++;
             }
+
+            if (Bx > 0)
+            {
+                totalProcessedTime += Bx;
+                BxCounter++;
+            }
+            totalIters++;
+
+            if (BxCounter * AxCounter > 0)
+            {
+                Msigma = totalProcessedTime / BxCounter;
+                Mtau = totalWaitingTime / AxCounter;
+                
+                if (totalIters > 10 && Msigma / Mtau > 1)
+                {
+                    Debug.LogError("Infinite loop occured");
+                    return null;
+                }
+            }
+
+
+            
 
         }
 
-        Debug.Log(serverLogList);
         
         return serverLogList;
     }

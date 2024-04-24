@@ -21,6 +21,6 @@ MonoBehaviour:
     from: 0.1
     to: 2
     step: 0.1
-    k: 1000
+    k: 10
     investigatedValue: 0
     dependencyValue: 0
