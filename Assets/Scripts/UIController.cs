@@ -68,6 +68,10 @@ public class UIController : MonoBehaviour
     
     private void ChangeUIState(UIState uiState)
     {
+        m_greenAux.SetActive(false);
+        m_greyAux.SetActive(false);
+        m_redAux.SetActive(false);
+        
         m_charts.SetActive(false);
         m_serverActivity.SetActive(false);
 
