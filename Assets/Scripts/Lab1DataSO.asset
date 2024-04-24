@@ -19,8 +19,8 @@ MonoBehaviour:
     std_dev: 1
     iterAmount: 10
     from: 0.1
-    to: 0.5
+    to: 2
     step: 0.1
-    k: 100
+    k: 1000
     investigatedValue: 0
-    dependencyValue: 1
+    dependencyValue: 0

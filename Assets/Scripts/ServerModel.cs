@@ -110,7 +110,10 @@ public class ServerModel : MonoBehaviour
     
         int totalIters = (int)((m_labData.to - m_labData.from) / m_labData.step) + 2;
         List<InvestigatePieceAbstract> investigatePiecesList = new List<InvestigatePieceAbstract>();
+        
         investigatePiecesList.Add(new InvestigateErland5D());
+        investigatePiecesList.Add(new InvestigateAbsGauss());
+
         
         
         // Debug.Log($"valuesLength: {(int) ((m_labData.to - m_labData.from) / m_labData.step)}");
@@ -128,10 +131,13 @@ public class ServerModel : MonoBehaviour
                 //////
 
                 var serverLog = ImitateServer();
-                
-                if(serverLog == null)
+
+                if (serverLog == null)
+                {
+                    SetDependencyValue(m_labData.dependencyValue, dependencyParamDefValue);
                     return;
-                
+                }
+
                 foreach (var investigatePiece in investigatePiecesList)
                 {
                     investigatePiece.InvestigateOne(serverLog);
@@ -199,6 +205,8 @@ public class ServerModel : MonoBehaviour
 
     private List<ServerLog> ImitateServer()
     {
+        // if(m_labData.lambda)
+        
         float serverTime = 0;
         float T1 = 0;
         float T2 = 0;
@@ -289,7 +297,7 @@ public class ServerModel : MonoBehaviour
 
 
             totalIters++;
-            if (totalIters > 1000000)
+            if (totalIters > 100000000)
             {
                 Debug.LogError("Infinite loop occured");
                 return null;
