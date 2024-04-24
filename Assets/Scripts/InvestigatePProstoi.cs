@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class InvestigatePProstoi : InvestigatePieceAbstract
 {
-    public override void InvestigateOne(List<ServerModel.ServerLog> serverLogList)
+    public override void InvestigateOne(ServerModel.ServerLog serverLog)
     {
         chartData.targetChart = TargetChart.P_prostoi;
 
@@ -14,7 +14,7 @@ public class InvestigatePProstoi : InvestigatePieceAbstract
 
         bool serverWasBusy = true;
         
-        foreach (var log in serverLogList)
+        foreach (var log in serverLog.generalLogDatasList)
         {
             if (log.serverTime > 0)
             {

@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class InvestigateAbsGauss : InvestigatePieceAbstract
 {
-    public override void InvestigateOne(List<ServerModel.ServerLog> serverLogList)
+    public override void InvestigateOne(ServerModel.ServerLog serverLog)
     {
         chartData.targetChart = TargetChart.Gauss;
 
         float sumAx = 0f;
         int iterCount = 0;
         
-        foreach (var log in serverLogList)
+        foreach (var log in serverLog.generalLogDatasList)
         {
             if (log.BxValue > 0)
             {

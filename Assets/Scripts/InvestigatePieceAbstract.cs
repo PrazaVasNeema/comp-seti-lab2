@@ -35,7 +35,7 @@ public abstract class InvestigatePieceAbstract
     public ChartData chartData = new ChartData();
     public float investigatedValueTempSum = 0f;
     
-    public abstract void InvestigateOne(List<ServerModel.ServerLog> serverLogList);
+    public abstract void InvestigateOne(ServerModel.ServerLog serverLog);
 
     public virtual void InvestigateTwo(int itersCount, float x)
     {

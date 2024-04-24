@@ -12,26 +12,51 @@ public class ServerModel : MonoBehaviour
             T1,
             T2
         }
-        
-        public EventType TIP;
-        public float serverTime;
-        public bool serverIsBusy;
-        public QBuffer qBuffer;
-        public int curTask;
-        public float AxValue;
-        public float BxValue;
-
-        public void SetValues(EventType TIP, float serverTime, bool serverIsBusy, QBuffer qBuffer, int curTask, float AxValue,
-            float BxValue)
+        public class TaskData
         {
-            this.TIP = TIP;
-            this.serverTime = serverTime;
-            this.serverIsBusy = serverIsBusy;
-            this.qBuffer = qBuffer;
-            this.curTask = curTask;
-            this.AxValue = AxValue;
-            this.BxValue = BxValue;
+            public int num;
+            public float arrivalTime;
+            public float finishTime = -1;
         }
+        
+        public List<TaskData> tasksList = new List<TaskData>();
+        
+        // A method to set finish time for a task in the tasksList with a certain num
+        public void SetTaskFinishTime(int taskNum, float finishTime)
+        {
+            var task = tasksList.Find(x => x.num == taskNum);
+            if (task != null)
+            {
+                task.finishTime = finishTime;
+            }
+        }
+        
+        public List<GeneralLogData> generalLogDatasList = new List<GeneralLogData>();
+        
+        public class GeneralLogData
+        {
+            public EventType TIP;
+            public float serverTime;
+            public bool serverIsBusy;
+            public QBuffer qBuffer;
+            public int curTask;
+            public float AxValue;
+            public float BxValue;
+
+            public void SetValues(EventType TIP, float serverTime, bool serverIsBusy, QBuffer qBuffer, int curTask, float AxValue,
+                float BxValue)
+            {
+                this.TIP = TIP;
+                this.serverTime = serverTime;
+                this.serverIsBusy = serverIsBusy;
+                this.qBuffer = qBuffer;
+                this.curTask = curTask;
+                this.AxValue = AxValue;
+                this.BxValue = BxValue;
+            }
+        }
+        
+        
     }
     
     public class QBuffer
@@ -114,6 +139,7 @@ public class ServerModel : MonoBehaviour
         investigatePiecesList.Add(new InvestigateErland5D());
         investigatePiecesList.Add(new InvestigateAbsGauss());
         investigatePiecesList.Add(new InvestigatePProstoi());
+        investigatePiecesList.Add(new InvestigateUx());
 
         
         
@@ -180,9 +206,9 @@ public class ServerModel : MonoBehaviour
 
     public void ImitateServerActivity()
     {
-        var serverLogList = ImitateServer();
+        var serverLog = ImitateServer();
 
-        if (serverLogList == null)
+        if (serverLog == null)
         {
             return;
         }
@@ -191,7 +217,7 @@ public class ServerModel : MonoBehaviour
         chartData.xAxisName = Lab1DataSO.DependencyValue.justTime;
         chartData.targetChart = InvestigatePieceAbstract.TargetChart.ServerActivity;
 
-        foreach (var log in serverLogList)
+        foreach (var log in serverLog.generalLogDatasList)
         {
             Debug.Log(" ---------------------- SERVER LOG START ---------------------- ");
             Debug.Log($"TIP: {log.TIP}, serverTime: {log.serverTime}, serverIsBusy: {log.serverIsBusy}, qBuffer: {log.qBuffer.bufferCount}, curTask: {log.curTask}, Ax: {log.AxValue}, Bx: {log.BxValue}");
@@ -205,7 +231,7 @@ public class ServerModel : MonoBehaviour
         GameEvents.OnBuildChart?.Invoke(chartData);
     }
 
-    private List<ServerLog> ImitateServer()
+    private ServerLog ImitateServer()
     {
         // if(m_labData.lambda)
         
@@ -223,7 +249,7 @@ public class ServerModel : MonoBehaviour
         ServerLog.EventType TIP = ServerLog.EventType.T1;
         int curProcessedTask = -1;
 
-        var serverLogList = new List<ServerLog>();
+        var serverLog = new ServerLog();
         // var curServerLog = new ServerLog();
 
         int totalIters = 0;
@@ -255,6 +281,8 @@ public class ServerModel : MonoBehaviour
                     T2 = serverTime + Bx;
 
                     curProcessedTask = totalTasksCount;
+                    
+                    serverLog.tasksList.Add(new ServerLog.TaskData {num = totalTasksCount, arrivalTime = serverTime});
                 }
                 else
                 {
@@ -266,6 +294,8 @@ public class ServerModel : MonoBehaviour
                             arrivalTime = serverTime
                         };
                         qBuffer.AddTask(qContent);
+                        serverLog.tasksList.Add(new ServerLog.TaskData {num = totalTasksCount, arrivalTime = serverTime});
+
                     }
                     else
                     {
@@ -279,6 +309,8 @@ public class ServerModel : MonoBehaviour
             {
                 serverTime = T2;
                 Bx = (float)ProbDistFuncModel.GenerateNormal(rng, m_labData.mean, m_labData.std_dev);
+                
+                serverLog.SetTaskFinishTime(curProcessedTask, serverTime);
                 
                 if (qBuffer.bufferCount == 0)
                 {
@@ -300,9 +332,9 @@ public class ServerModel : MonoBehaviour
             }
             // Debug.Log($"1: TIP: {TIP}, serverTime: {serverTime}, serverIsBusy: {serverIsBusy}, qBuffer: {qBuffer.bufferCount}, curTask: {curProcessedTask}, Ax: {Ax}, Bx: {Bx}");
 
-            var curServerLog = new ServerLog();
-            curServerLog.SetValues(TIP, serverTime, serverIsBusy, qBuffer.Clone(), curProcessedTask, Ax, Bx);
-            serverLogList.Add(curServerLog);
+            var curServerGeneralLog = new ServerLog.GeneralLogData();
+            curServerGeneralLog.SetValues(TIP, serverTime, serverIsBusy, qBuffer.Clone(), curProcessedTask, Ax, Bx);
+            serverLog.generalLogDatasList.Add(curServerGeneralLog);
 
             if (Ax > 0)
             {
@@ -322,7 +354,7 @@ public class ServerModel : MonoBehaviour
                 Msigma = totalProcessedTime / BxCounter;
                 Mtau = totalWaitingTime / AxCounter;
                 
-                if (totalIters > 10 && Msigma / Mtau > 1)
+                if (totalIters > 10 && Msigma / (Mtau*1.5) > 1)
                 {
                     Debug.LogError("Infinite loop occured");
                     return null;
@@ -335,7 +367,7 @@ public class ServerModel : MonoBehaviour
         }
 
         
-        return serverLogList;
+        return serverLog;
     }
 
     private void SetDependencyValue(Lab1DataSO.DependencyValue lab1DDependencyValue, float value)
