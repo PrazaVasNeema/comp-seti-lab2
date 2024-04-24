@@ -131,6 +131,8 @@ public class ServerModel : MonoBehaviour
     
     public void Calculate()
     {
+        GameEvents.OnChangeUIStateAux?.Invoke(UIController.UIStateAux.Grey);
+        
         float dependencyParamDefValue = GetDependencyValue(m_labData.dependencyValue);
     
         int totalIters = (int)((m_labData.to - m_labData.from) / m_labData.step) + 2;
@@ -163,6 +165,7 @@ public class ServerModel : MonoBehaviour
                 if (serverLog == null)
                 {
                     SetDependencyValue(m_labData.dependencyValue, dependencyParamDefValue);
+                    GameEvents.OnChangeUIStateAux?.Invoke(UIController.UIStateAux.Red);
                     return;
                 }
 
@@ -202,6 +205,9 @@ public class ServerModel : MonoBehaviour
         
         // Debug.Log(chartDataList.Count);
         
+        GameEvents.OnChangeUIStateAux?.Invoke(UIController.UIStateAux.Green);
+
+        
     }
 
     public void ImitateServerActivity()
@@ -216,10 +222,10 @@ public class ServerModel : MonoBehaviour
         var chartData = new InvestigatePieceAbstract.ChartData();
         chartData.xAxisName = Lab1DataSO.DependencyValue.justTime;
         chartData.targetChart = InvestigatePieceAbstract.TargetChart.ServerActivity;
-
+        
+        Debug.Log(" ---------------------- SERVER LOG START ---------------------- ");
         foreach (var log in serverLog.generalLogDatasList)
         {
-            Debug.Log(" ---------------------- SERVER LOG START ---------------------- ");
             Debug.Log($"TIP: {log.TIP}, serverTime: {log.serverTime}, serverIsBusy: {log.serverIsBusy}, qBuffer: {log.qBuffer.bufferCount}, curTask: {log.curTask}, Ax: {log.AxValue}, Bx: {log.BxValue}");
             if (Equals(log.TIP, ServerLog.EventType.T1))
             {
