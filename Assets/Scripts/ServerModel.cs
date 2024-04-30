@@ -5,120 +5,9 @@ using UnityEngine;
 
 public class ServerModel : MonoBehaviour
 {
-    public class ServerLog
-    {
-        public enum EventType
-        {
-            T1,
-            T2
-        }
-        public class TaskData
-        {
-            public int num;
-            public float arrivalTime;
-            public float finishTime = -1;
-        }
-        
-        public List<TaskData> tasksList = new List<TaskData>();
-        
-        // A method to set finish time for a task in the tasksList with a certain num
-        public void SetTaskFinishTime(int taskNum, float finishTime)
-        {
-            var task = tasksList.Find(x => x.num == taskNum);
-            if (task != null)
-            {
-                task.finishTime = finishTime;
-            }
-        }
-        
-        public List<GeneralLogData> generalLogDatasList = new List<GeneralLogData>();
-        
-        public class GeneralLogData
-        {
-            public EventType TIP;
-            public float serverTime;
-            public bool serverIsBusy;
-            public QBuffer qBuffer;
-            public int curTask;
-            public float AxValue;
-            public float BxValue;
 
-            public void SetValues(EventType TIP, float serverTime, bool serverIsBusy, QBuffer qBuffer, int curTask, float AxValue,
-                float BxValue)
-            {
-                this.TIP = TIP;
-                this.serverTime = serverTime;
-                this.serverIsBusy = serverIsBusy;
-                this.qBuffer = qBuffer;
-                this.curTask = curTask;
-                this.AxValue = AxValue;
-                this.BxValue = BxValue;
-            }
-        }
-        
-        
-    }
     
-    public class QBuffer
-    {
-        public class QContent
-        {
-            public int taskNum;
-            public float arrivalTime;
-        }
-        
-        private List<QContent> qContentsList = new List<QContent>();
-        private int currentIndex = 0;
-        
-        public int bufferCount => qContentsList.Count;
-        
-        public QContent RemoveTask(int taskNum)
-        {
-            var output = qContentsList.Find(x => x.taskNum == taskNum);
-            qContentsList.RemoveAll(x => x.taskNum == taskNum);
 
-            return output;
-        }
-        
-        public QContent RemoveTaskByIndex(int index)
-        {
-            if (index < 0 || index >= qContentsList.Count)
-                return null;
-            
-            var output = qContentsList[index];
-            qContentsList.RemoveAt(index);
-
-            return output;
-        }
-        
-        // Реализуй выбор элемента из списка qContentsList, использующий RoundRobin
-
-        public QContent GetTaskRoundRobin()
-        {
-            if (qContentsList.Count == 0)
-                return null;
-            
-            currentIndex = ++currentIndex % qContentsList.Count;
-
-            return RemoveTaskByIndex(currentIndex);
-        }
-        
-        public void AddTask(QContent qContent)
-        {
-            qContentsList.Add(qContent);
-        }
-        
-        // Method to clone data into another instance of that class
-        public QBuffer Clone()
-        {
-            QBuffer newQBuffer = new QBuffer();
-            newQBuffer.qContentsList = new List<QContent>(qContentsList);
-            newQBuffer.currentIndex = currentIndex;
-
-            return newQBuffer;
-        }
-        
-    }
 
 
 
@@ -131,113 +20,60 @@ public class ServerModel : MonoBehaviour
     
     public void Calculate()
     {
-        GameEvents.OnChangeUIStateAux?.Invoke(UIController.UIStateAux.Grey);
-        
-        float dependencyParamDefValue = GetDependencyValue(m_labData.dependencyValue);
-    
-        int totalIters = (int)((m_labData.to - m_labData.from) / m_labData.step) + 2;
-        List<InvestigatePieceAbstract> investigatePiecesList = new List<InvestigatePieceAbstract>();
-        
-        investigatePiecesList.Add(new InvestigateErland5D());
-        investigatePiecesList.Add(new InvestigateAbsGauss());
-        investigatePiecesList.Add(new InvestigatePProstoi());
-        investigatePiecesList.Add(new InvestigateUx());
-
-        
+        var processDataProbabilityGauss = new ProcessDataProbability(ProcessDataProbability.FuncEnum.Gauss);
+        var processDataProbabilityErland5D = new ProcessDataProbability(ProcessDataProbability.FuncEnum.Erland5D);
         
         // Debug.Log($"valuesLength: {(int) ((m_labData.to - m_labData.from) / m_labData.step)}");
     
-        int arrayIter = -1;
-        for (float i = m_labData.from; i <= m_labData.to; i += m_labData.step)
+        var serverLogList = new List<NDT.ServerLog>();
+        for (int j = 0; j < m_labData.iterAmount; j++)
         {
-            arrayIter++;
-            SetDependencyValue(m_labData.dependencyValue, i);
-    
-            float sumIters = 0;
-            int iterTest = 0;
-            for (int j = 0; j < m_labData.iterAmount; j++)
+            var serverLog = ImitateServer();
+            if (serverLog == null)
             {
-    
-                //////
-
-                var serverLog = ImitateServer();
-
-                if (serverLog == null)
-                {
-                    SetDependencyValue(m_labData.dependencyValue, dependencyParamDefValue);
-                    GameEvents.OnChangeUIStateAux?.Invoke(UIController.UIStateAux.Red);
-                    return;
-                }
-
-                foreach (var investigatePiece in investigatePiecesList)
-                {
-                    investigatePiece.InvestigateOne(serverLog);
-                }
-    
-                // sumTasks /= m_labData.k;
-                iterTest++;
-
+                GameEvents.OnChangeUIStateAux?.Invoke(UIController.UIStateAux.Red);
+                return;
             }
-
-            foreach (var investigatePiece in investigatePiecesList)
-            {
-                investigatePiece.InvestigateTwo(iterTest, i);
-            }
-            
-    
+            serverLogList.Add(serverLog);
         }
 
-        foreach (var investigatePiece in investigatePiecesList)
-        {
-            var chartData = investigatePiece.InvestigateFinal(m_labData.dependencyValue);
-            
-            GameEvents.OnBuildChart?.Invoke(chartData);
-        }
-    
-        SetDependencyValue(m_labData.dependencyValue, dependencyParamDefValue);
-    
-        // foreach (var value in valuesArray)
-        // {
-        //     Debug.Log($"P_Prostoi: {value}");
-        // }
-        
-        // m_ChartView.UpdateChart(chartDataList);
-        
-        // Debug.Log(chartDataList.Count);
+        NDT.ViewData viewData;
+        viewData = processDataProbabilityGauss.GetViewData(serverLogList);
+        GameEvents.OnBuildView?.Invoke(viewData);
+        viewData = processDataProbabilityErland5D.GetViewData(serverLogList);
+        GameEvents.OnBuildView?.Invoke(viewData);
         
         GameEvents.OnChangeUIStateAux?.Invoke(UIController.UIStateAux.Green);
-
-        
     }
 
-    public void ImitateServerActivity()
-    {
-        var serverLog = ImitateServer();
+    // public void ImitateServerActivity()
+    // {
+    //     var serverLog = ImitateServer();
+    //
+    //     if (serverLog == null)
+    //     {
+    //         return;
+    //     }
+    //     
+    //     var chartData = new InvestigatePieceAbstract.ChartData();
+    //     chartData.xAxisName = Lab1DataSO.DependencyValue.justTime;
+    //     chartData.targetChart = InvestigatePieceAbstract.TargetChart.ServerActivity;
+    //     
+    //     Debug.Log(" ---------------------- SERVER LOG START ---------------------- ");
+    //     foreach (var log in serverLog.generalLogDatasList)
+    //     {
+    //         Debug.Log($"TIP: {log.TIP}, serverTime: {log.serverTime}, serverIsBusy: {log.serverIsBusy}, qBuffer: {log.qBuffer.bufferCount}, curTask: {log.curTask}, Ax: {log.AxValue}, Bx: {log.BxValue}");
+    //         if (Equals(log.TIP, ServerLog.EventType.T1))
+    //         {
+    //             var point = new InvestigatePieceAbstract.ChartData.Points(log.serverTime, log.qBuffer.bufferCount + (log.serverIsBusy ? 1 : 0));
+    //             chartData.pointsList.Add(point);
+    //         }
+    //     }
+    //     
+    //     GameEvents.OnBuildView?.Invoke(chartData);
+    // }
 
-        if (serverLog == null)
-        {
-            return;
-        }
-        
-        var chartData = new InvestigatePieceAbstract.ChartData();
-        chartData.xAxisName = Lab1DataSO.DependencyValue.justTime;
-        chartData.targetChart = InvestigatePieceAbstract.TargetChart.ServerActivity;
-        
-        Debug.Log(" ---------------------- SERVER LOG START ---------------------- ");
-        foreach (var log in serverLog.generalLogDatasList)
-        {
-            Debug.Log($"TIP: {log.TIP}, serverTime: {log.serverTime}, serverIsBusy: {log.serverIsBusy}, qBuffer: {log.qBuffer.bufferCount}, curTask: {log.curTask}, Ax: {log.AxValue}, Bx: {log.BxValue}");
-            if (Equals(log.TIP, ServerLog.EventType.T1))
-            {
-                var point = new InvestigatePieceAbstract.ChartData.Points(log.serverTime, log.qBuffer.bufferCount + (log.serverIsBusy ? 1 : 0));
-                chartData.pointsList.Add(point);
-            }
-        }
-        
-        GameEvents.OnBuildChart?.Invoke(chartData);
-    }
-
-    private ServerLog ImitateServer()
+    private NDT.ServerLog ImitateServer()
     {
         // if(m_labData.lambda)
         
@@ -245,17 +81,17 @@ public class ServerModel : MonoBehaviour
         float T1 = 0;
         float T2 = 0;
         bool serverIsBusy = false;
-        QBuffer qBuffer = new QBuffer();
+        var qBuffer = new NDT.QBuffer();
         int compTasksCount = 0;
         int totalTasksCount = 0;
 
-        System.Random rng = new System.Random();
+        var rng = new System.Random();
         float Ax;
         float Bx;
-        ServerLog.EventType TIP = ServerLog.EventType.T1;
+        var TIP = NDT.ServerLog.EventType.T1;
         int curProcessedTask = -1;
 
-        var serverLog = new ServerLog();
+        var serverLog = new NDT.ServerLog();
         // var curServerLog = new ServerLog();
 
         int totalIters = 0;

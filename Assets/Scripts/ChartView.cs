@@ -33,12 +33,12 @@ public class ChartView : MonoBehaviour
 
     private void OnEnable()
     {
-        GameEvents.OnBuildChart += UpdateChart;
+        GameEvents.OnBuildView += UpdateChart;
     }
 
     private void OnDisable()
     {
-        GameEvents.OnBuildChart -= UpdateChart;
+        GameEvents.OnBuildView -= UpdateChart;
     }
 
     private void UpdateChart(InvestigatePieceAbstract.ChartData chartData)
