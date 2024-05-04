@@ -2,16 +2,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
-public class ServerModel : MonoBehaviour
+public class Server : MonoBehaviour
 {
 
-    
-
-
-
-
-    [SerializeField] private ChartView m_ChartView;
+    [FormerlySerializedAs("m_ChartView")] [SerializeField] private DataView dataView;
     
     [SerializeField] private Lab1DataSO m_labDataSO;
     private Lab1DataSO.Data m_labData => m_labDataSO.data;
@@ -78,18 +74,18 @@ public class ServerModel : MonoBehaviour
         // if(m_labData.lambda)
         
         float serverTime = 0;
-        float T1 = 0;
-        float T2 = 0;
+        float T1;
+        float T2 = float.MaxValue;
         bool serverIsBusy = false;
         var qBuffer = new NDT.QBuffer();
         int compTasksCount = 0;
         int totalTasksCount = 0;
 
         var rng = new System.Random();
-        float Ax;
-        float Bx;
+        float Ax = 0f;
+        float Bx = 0f;
         var TIP = NDT.ServerLog.EventType.T1;
-        int curProcessedTask = -1;
+        NDT.TaskData curProcessedTask = null;
 
         var serverLog = new NDT.ServerLog();
         // var curServerLog = new ServerLog();
@@ -103,49 +99,41 @@ public class ServerModel : MonoBehaviour
         float Mtau = 0;
         float Msigma = 0;
         
+        Ax = (float) ProbDistFuncModel.GenerateErlang(rng, 5, m_labData.lambda, m_labData.D);
+        T1 = Ax;
+        
         
         while (compTasksCount < m_labData.k)
         {
             Ax = 0f;  
             Bx = 0f; 
-            if (T1 < T2 || T1 == 0)
+            if (T1 < T2)
             {
                 serverTime = T1;
                 Ax = (float) ProbDistFuncModel.GenerateErlang(rng, 5, m_labData.lambda, m_labData.D);
                 T1 += Ax;
 
                 totalTasksCount++;
+                
+                var newTask = new NDT.TaskData{num = totalTasksCount, arrivalTime = serverTime};
+                serverLog.alltimeTaskList.Add(curProcessedTask);
 
                 if (!serverIsBusy)
                 {
                     serverIsBusy = true;
                     Bx = (float)ProbDistFuncModel.GenerateNormal(rng, m_labData.mean, m_labData.std_dev);
                     T2 = serverTime + Bx;
-
-                    curProcessedTask = totalTasksCount;
-                    
-                    serverLog.tasksList.Add(new ServerLog.TaskData {num = totalTasksCount, arrivalTime = serverTime});
+                    curProcessedTask = newTask;
                 }
                 else
                 {
                     if (qBuffer.bufferCount < m_qMaxSize)
                     {
-                        var qContent = new QBuffer.QContent
-                        {
-                            taskNum = totalTasksCount,
-                            arrivalTime = serverTime
-                        };
-                        qBuffer.AddTask(qContent);
-                        serverLog.tasksList.Add(new ServerLog.TaskData {num = totalTasksCount, arrivalTime = serverTime});
-
-                    }
-                    else
-                    {
-                        // Debug.Log("Buffer is full");
+                        qBuffer.AddTask(newTask);
                     }
                 }
 
-                TIP = ServerLog.EventType.T1;
+                TIP = NDT.ServerLog.EventType.T1;
             }
             else
             {
@@ -154,29 +142,30 @@ public class ServerModel : MonoBehaviour
                 
                 serverLog.SetTaskFinishTime(curProcessedTask, serverTime);
                 
-                if (qBuffer.bufferCount == 0)
+                switch (qBuffer.bufferCount)
                 {
-                    serverIsBusy = false;
-                    T2 = T1 + Bx;
-                    curProcessedTask = -1;
+                    case 0:
+                        serverIsBusy = false;
+                        T2 = float.MaxValue;
+                        curProcessedTask = null;
+                        break;
+                    case > 0:
+                    {
+                        var newTaskFromBuffer = qBuffer.GetTaskRoundRobin();
+                        curProcessedTask = newTaskFromBuffer;
+                        T2 = serverTime + Bx;
+                        break;
+                    }
                 }
-                else if (qBuffer.bufferCount > 0)
-                {
-                    var newTaskFromBuffer = qBuffer.GetTaskRoundRobin();
-                    curProcessedTask = newTaskFromBuffer.taskNum;
-                    T2 = serverTime + Bx;
-                }
-                
-                
-                
-                TIP = ServerLog.EventType.T2;
+                TIP = NDT.ServerLog.EventType.T2;
                 compTasksCount++;
             }
+            
             // Debug.Log($"1: TIP: {TIP}, serverTime: {serverTime}, serverIsBusy: {serverIsBusy}, qBuffer: {qBuffer.bufferCount}, curTask: {curProcessedTask}, Ax: {Ax}, Bx: {Bx}");
 
-            var curServerGeneralLog = new ServerLog.GeneralLogData();
+            var curServerGeneralLog = new NDT.ServerLog.ServerStatus();
             curServerGeneralLog.SetValues(TIP, serverTime, serverIsBusy, qBuffer.Clone(), curProcessedTask, Ax, Bx);
-            serverLog.generalLogDatasList.Add(curServerGeneralLog);
+            serverLog.serverStatusList.Add(curServerGeneralLog);
 
             if (Ax > 0)
             {

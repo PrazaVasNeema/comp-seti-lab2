@@ -3,9 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.Serialization;
 using XCharts.Runtime;
 
-public class ChartView : MonoBehaviour
+public class DataView : MonoBehaviour
 {
     // [SerializeField] private TMP_Text m_investigatedValueText;
 
@@ -13,7 +14,9 @@ public class ChartView : MonoBehaviour
 
     private SerieData m_defaultSerieData;
 
-    [SerializeField] private InvestigatePieceAbstract.TargetChart m_chartType;
+    [SerializeField] private NDT.TargetView m_targetViewType;
+
+    [SerializeField] private NDT.ViewData.ViewType m_ViewType;
     // [SerializeField] private TMP_Text m_dependencyValueText;
 
 
@@ -41,33 +44,49 @@ public class ChartView : MonoBehaviour
         GameEvents.OnBuildView -= UpdateChart;
     }
 
-    private void UpdateChart(InvestigatePieceAbstract.ChartData chartData)
+    private void UpdateChart(NDT.ViewData viewData)
     {
-        if(!Equals(chartData.targetChart, m_chartType))
+        if(!Equals(viewData.targetView, m_targetViewType))
             return;
-        
-        // m_dependencyValueText.text = chartData.xAxisName.ToString();
-        
-        m_LineChart.EnsureChartComponent<XAxis>().axisName.name = chartData.xAxisName.ToString();
-        
-        m_LineChart.series[0].data.Clear();
 
-        foreach (var point in chartData.pointsList)
+        switch (m_ViewType)
+        {
+            case NDT.ViewData.ViewType.Chart:
+                FillChart(viewData.pointsList);
+                break;
+            case NDT.ViewData.ViewType.Table:
+                break;
+        };
+        
+
+        // m_dependencyValueText.text = chartData.xAxisName.ToString();
+
+
+    }
+
+    private void FillChart(List<NDT.ViewData.Points> pointsList)
+    {
+        // m_LineChart.EnsureChartComponent<XAxis>().axisName.name = chartData.xAxisName.ToString();
+        
+        // m_LineChart.series[0].data.Clear();
+
+        
+        
+        m_LineChart.AddSerie<Line>($"line {m_LineChart.series.Count}");
+
+        int seriesCount = m_LineChart.series.Count;
+        
+        foreach (var point in pointsList)
         {
 // Debug.Log(1);
 
+
             // var newSerieData = new SerieData();
-            m_LineChart.AddData(0, point.x, point.y);
+            m_LineChart.AddData(seriesCount - 1, point.x, point.y);
             // m_defaultSerieData.data[0] = chartData.x;
             // m_defaultSerieData.data[1] = chartData.y;
             
             // m_LineChart.series[0].data.Add(m_defaultSerieData);
         }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

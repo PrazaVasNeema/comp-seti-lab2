@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.VersionControl;
 using UnityEngine;
 
 public class NDT
@@ -9,6 +11,12 @@ public class NDT
         public int num;
         public float arrivalTime;
         public float finishTime = -1;
+        
+        // public TaskData(int num, float arrivalTime)
+        // {
+        //     this.num = num;
+        //     this.arrivalTime = arrivalTime;
+        // }
     }
     public class ServerLog
     {
@@ -18,11 +26,21 @@ public class NDT
             T2
         }
         // All time tasks data
-        public List<TaskData> allTimeTasksList = new();
+        public List<TaskData> alltimeTaskList = new();
         // A method to set finish time for a task in the tasksList with a certain num
-        public void SetTaskFinishTime(int taskNum, float finishTime)
+        public void SetTaskFinishTime(TaskData curTask, float finishTime)
         {
-            var task = allTimeTasksList.Find(x => x.num == taskNum);
+            try
+            {
+                int test = curTask.num;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                Debug.LogError("Got null task!");
+                throw;
+            }
+            var task = alltimeTaskList.Find(x => x.num == curTask.num);
             if (task != null) task.finishTime = finishTime;
         }
         // Server status upon event
@@ -33,10 +51,10 @@ public class NDT
             public float serverTime;
             public bool serverIsBusy;
             public QBuffer qBuffer;
-            public int curTask;
+            public TaskData curTask;
             public float AxValue;
             public float BxValue;
-            public void SetValues(EventType TIP, float serverTime, bool serverIsBusy, QBuffer qBuffer, int curTask,
+            public void SetValues(EventType TIP, float serverTime, bool serverIsBusy, QBuffer qBuffer, TaskData curTask,
                 float AxValue,
                 float BxValue)
             {
