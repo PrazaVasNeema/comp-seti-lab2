@@ -123,7 +123,7 @@ public class NDT
     
     public enum TargetView
     {
-        // Ux,
+        Ux,
         // P_prostoi,
         Erland,
         Gauss,

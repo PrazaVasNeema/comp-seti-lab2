@@ -19,6 +19,9 @@ public class Server : MonoBehaviour
         var processDataProbabilityGauss = new ProcessDataProbability(ProcessDataProbability.FuncEnum.Gauss);
         var processDataProbabilityErland5D = new ProcessDataProbability(ProcessDataProbability.FuncEnum.Erland5D);
         
+        var processDataProbabilityUx = new ProcessDataProbabilityUx();
+
+        
         // Debug.Log($"valuesLength: {(int) ((m_labData.to - m_labData.from) / m_labData.step)}");
     
         var serverLogList = new List<NDT.ServerLog>();
@@ -37,6 +40,8 @@ public class Server : MonoBehaviour
         viewData = processDataProbabilityGauss.GetViewData(serverLogList);
         GameEvents.OnBuildView?.Invoke(viewData);
         viewData = processDataProbabilityErland5D.GetViewData(serverLogList);
+        GameEvents.OnBuildView?.Invoke(viewData);
+        viewData = processDataProbabilityUx.GetViewData(serverLogList);
         GameEvents.OnBuildView?.Invoke(viewData);
         
         GameEvents.OnChangeUIStateAux?.Invoke(UIController.UIStateAux.Green);
