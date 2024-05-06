@@ -36,6 +36,8 @@ public class ProcessDataProbabilityUx
         {
             ValidateMaxValue(serverLog.alltimeTaskList);
         }
+
+        int maxCount = 0;
         
         foreach (var serverLog in serverLogList)
         {
@@ -43,12 +45,28 @@ public class ProcessDataProbabilityUx
             {
                 float timeToFinishValue = taskData.finishTime - taskData.arrivalTime;
                 densityDict[(int) (Mathf.Lerp(0, 99.9f,timeToFinishValue / maxValue))]++;
+                maxCount++;
             }
         }
+        
+        var sumDict = new Dictionary<float, float>();
+        float sumValue = 0;
+        
+        Debug.Log($"MaxCount: {maxCount}");
+        
+        foreach (var density in densityDict)
+        {
+            sumValue += (float) density.Value / maxCount;
+            Debug.Log($"Sum value: {sumValue}");
+            sumDict.Add(density.Key, sumValue);
+            // viewData.pointsList.Add(new NDT.ViewData.Points(density.Key, density.Value));
+        }
+        
+        
 
         var viewData = FormViewDataInstance();
 
-        foreach (var density in densityDict)
+        foreach (var density in sumDict)
         {
             viewData.pointsList.Add(new NDT.ViewData.Points(density.Key, density.Value));
         }
