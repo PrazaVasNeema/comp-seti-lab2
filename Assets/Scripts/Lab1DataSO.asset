@@ -15,7 +15,7 @@ MonoBehaviour:
   m_data:
     lambda: 1
     D: 0.1
-    mean: 0.9
+    mean: 1
     std_dev: 1
     iterAmount: 100
     k: 100
