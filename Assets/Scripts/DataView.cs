@@ -70,8 +70,6 @@ public class DataView : MonoBehaviour
         
         // m_LineChart.series[0].data.Clear();
 
-        
-        
         m_LineChart.AddSerie<Line>($"line {m_LineChart.series.Count}");
 
         int seriesCount = m_LineChart.series.Count;
@@ -87,6 +85,25 @@ public class DataView : MonoBehaviour
             // m_defaultSerieData.data[1] = chartData.y;
             
             // m_LineChart.series[0].data.Add(m_defaultSerieData);
+        }
+    }
+    
+    public void RemoveViewData()
+    {
+        m_LineChart.RemoveData();
+    }
+    
+    public void RemoveAllViewData()
+    {
+        // Debug.Log(1);
+
+        var charts = FindObjectsOfType<DataView>();
+
+        foreach (var chart in charts)
+        {
+            // Debug.Log(2);
+
+            chart.RemoveViewData();
         }
     }
 }

@@ -116,7 +116,7 @@ public class Server : MonoBehaviour
                 totalTasksCount++;
                 
                 var newTask = new NDT.TaskData{num = totalTasksCount, arrivalTime = serverTime};
-                serverLog.alltimeTaskList.Add(curProcessedTask);
+                serverLog.alltimeTaskList.Add(newTask);
 
                 if (!serverIsBusy)
                 {
@@ -166,6 +166,8 @@ public class Server : MonoBehaviour
             var curServerGeneralLog = new NDT.ServerLog.ServerStatus();
             curServerGeneralLog.SetValues(TIP, serverTime, serverIsBusy, qBuffer.Clone(), curProcessedTask, Ax, Bx);
             serverLog.serverStatusList.Add(curServerGeneralLog);
+            
+            // Debug.Log($"Ax: {Ax}");
 
             if (Ax > 0)
             {

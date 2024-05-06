@@ -12,6 +12,16 @@ public class NDT
         public float arrivalTime;
         public float finishTime = -1;
         
+        // A method to clone data into another instance of that class
+        public TaskData Clone()
+        {
+            TaskData newTaskData = new TaskData();
+            newTaskData.num = num;
+            newTaskData.arrivalTime = arrivalTime;
+            newTaskData.finishTime = finishTime;
+            return newTaskData;
+        }
+        
         // public TaskData(int num, float arrivalTime)
         // {
         //     this.num = num;
@@ -26,7 +36,7 @@ public class NDT
             T2
         }
         // All time tasks data
-        public List<TaskData> alltimeTaskList = new();
+        public List<TaskData> alltimeTaskList = new List<TaskData>();
         // A method to set finish time for a task in the tasksList with a certain num
         public void SetTaskFinishTime(TaskData curTask, float finishTime)
         {

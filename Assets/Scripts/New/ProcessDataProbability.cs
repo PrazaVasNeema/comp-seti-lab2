@@ -21,6 +21,7 @@ public class ProcessDataProbability
     {
         this.chosenFunc = chosenFunc;
 
+        densityDict = new Dictionary<int, int>();
         for (int i = 0; i < 100; i++)
         {
             densityDict.Add(i, 0);
@@ -40,8 +41,25 @@ public class ProcessDataProbability
         {
             foreach (var serverStatus in serverLog.serverStatusList)
             {
+                ValidateMaxValue(serverStatus);
+            }
+            if (chosenFunc == FuncEnum.Erland5D)
+            {
+                // Debug.Log($"maxValue: {maxValue}");
+            }
+            foreach (var serverStatus in serverLog.serverStatusList)
+            {
                 float value = GetNeededLogData(serverStatus);
-                densityDict[(int)(value / maxValue)]++;
+                if (value == 0)
+                    continue;
+                if (chosenFunc == FuncEnum.Erland5D)
+                {
+                    // Debug.Log($"value: {value}");
+                    // Debug.Log((value / maxValue));
+                    // Debug.Log((int) (Mathf.Lerp(0, 99.9f,value / maxValue)));
+                }
+
+                densityDict[(int) (Mathf.Lerp(0, 99.9f,value / maxValue))]++;
             }
         }
 
@@ -50,6 +68,11 @@ public class ProcessDataProbability
         foreach (var density in densityDict)
         {
             viewData.pointsList.Add(new NDT.ViewData.Points(density.Key, density.Value));
+
+            if (chosenFunc == FuncEnum.Erland5D)
+            {
+                // Debug.Log($"density.Key: {density.Key}, density.Value: {density.Value}");
+            }
         }
 
         return viewData;
