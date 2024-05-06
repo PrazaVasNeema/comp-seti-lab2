@@ -87,10 +87,17 @@ public class DataView : MonoBehaviour
             // m_LineChart.series[0].data.Add(m_defaultSerieData);
         }
     }
+
+    public static int curParamsValuesCount = 0;
     
     public void RemoveViewData()
     {
+        for (int i = curParamsValuesCount; i > 0; i--)
+        {
+            GameEvents.OnClearAuxParamsView?.Invoke(i);
+        }
         m_LineChart.RemoveData();
+        curParamsValuesCount = 0;
     }
     
     public void RemoveAllViewData()

@@ -6,6 +6,13 @@ using UnityEngine.Serialization;
 
 public class Server : MonoBehaviour
 {
+    
+    public static Server Instance { get; private set; }
+
+    private void OnEnable()
+    {
+        Instance = this;
+    }
 
     [FormerlySerializedAs("m_ChartView")] [SerializeField] private DataView dataView;
     
@@ -14,12 +21,18 @@ public class Server : MonoBehaviour
     // [SerializeField] private int m_serverCores;
     [SerializeField] private int m_qMaxSize;
     
+    
+    
+    
+    
     public void Calculate()
     {
         var processDataProbabilityGauss = new ProcessDataProbability(ProcessDataProbability.FuncEnum.Gauss);
         var processDataProbabilityErland5D = new ProcessDataProbability(ProcessDataProbability.FuncEnum.Erland5D);
         
         var processDataProbabilityUx = new ProcessDataProbabilityUx();
+        var processDataProbabilityPprostoi = new ProcessDataProbabilityPprostoi();
+
 
         
         // Debug.Log($"valuesLength: {(int) ((m_labData.to - m_labData.from) / m_labData.step)}");
@@ -43,6 +56,10 @@ public class Server : MonoBehaviour
         GameEvents.OnBuildView?.Invoke(viewData);
         viewData = processDataProbabilityUx.GetViewData(serverLogList);
         GameEvents.OnBuildView?.Invoke(viewData);
+        processDataProbabilityPprostoi.GetViewData(serverLogList, m_labData);
+        // GameEvents.OnBuildView?.Invoke(viewData);
+        
+        GameEvents.OnChangeAuxParamsView?.Invoke(++DataView.curParamsValuesCount, m_labData);
         
         GameEvents.OnChangeUIStateAux?.Invoke(UIController.UIStateAux.Green);
     }

@@ -14,13 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_data:
     lambda: 1
-    D: 0
-    mean: 1
+    D: 0.1
+    mean: 0.9
     std_dev: 1
-    iterAmount: 1000
-    from: 0.1
-    to: 1.17
-    step: 0.1
-    k: 1000
-    investigatedValue: 0
-    dependencyValue: 0
+    iterAmount: 100
+    k: 100
