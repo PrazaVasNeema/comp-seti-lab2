@@ -48,7 +48,7 @@ public class UIController : MonoBehaviour
                 m_greenAux.SetActive(true);
                 break;
             case UIStateAux.Grey:
-                m_greenAux.SetActive(true);
+                m_greyAux.SetActive(true);
                 break;
             case UIStateAux.Red:
                 m_redAux.SetActive(true);

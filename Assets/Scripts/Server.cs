@@ -1,8 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Serialization;
+using UnityEngine.UI;
 
 public class Server : MonoBehaviour
 {
@@ -20,12 +23,35 @@ public class Server : MonoBehaviour
     private Lab1DataSO.Data m_labData => m_labDataSO.data;
     // [SerializeField] private int m_serverCores;
     [SerializeField] private int m_qMaxSize;
-    
-    
-    
-    
-    
-    public void Calculate()
+
+    private CancellationTokenSource cancelTokenSource;
+
+    private bool m_shouldPrintData = false;
+
+    [SerializeField] private GameObject m_progressBarGO;
+    [SerializeField] private Image m_progressBar;
+    private float m_progressBarFillRate = 0;
+
+    private void Start()
+    {
+        cancelTokenSource = new CancellationTokenSource();
+    }
+
+    private void Update()
+    {
+        if (Time.frameCount % 10 == 0)
+        {
+            m_progressBar.fillAmount = m_progressBarFillRate;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        cancelTokenSource.Cancel();
+    }
+
+
+    public async void Calculate()
     {
         var processDataProbabilityGauss = new ProcessDataProbability(ProcessDataProbability.FuncEnum.Gauss);
         var processDataProbabilityErland5D = new ProcessDataProbability(ProcessDataProbability.FuncEnum.Erland5D);
@@ -33,35 +59,98 @@ public class Server : MonoBehaviour
         var processDataProbabilityUx = new ProcessDataProbabilityUx();
         var processDataProbabilityPprostoi = new ProcessDataProbabilityPprostoi();
 
+        GameEvents.OnChangeUIStateAux?.Invoke(UIController.UIStateAux.Grey);
+        
+        // m_progressBarGO.SetActive(true);
 
         
         // Debug.Log($"valuesLength: {(int) ((m_labData.to - m_labData.from) / m_labData.step)}");
-    
-        var serverLogList = new List<NDT.ServerLog>();
-        for (int j = 0; j < m_labData.iterAmount; j++)
-        {
-            var serverLog = ImitateServer();
-            if (serverLog == null)
-            {
-                GameEvents.OnChangeUIStateAux?.Invoke(UIController.UIStateAux.Red);
-                return;
-            }
-            serverLogList.Add(serverLog);
-        }
 
-        NDT.ViewData viewData;
-        viewData = processDataProbabilityGauss.GetViewData(serverLogList);
-        GameEvents.OnBuildView?.Invoke(viewData);
-        viewData = processDataProbabilityErland5D.GetViewData(serverLogList);
-        GameEvents.OnBuildView?.Invoke(viewData);
-        viewData = processDataProbabilityUx.GetViewData(serverLogList);
-        GameEvents.OnBuildView?.Invoke(viewData);
-        processDataProbabilityPprostoi.GetViewData(serverLogList, m_labData);
-        // GameEvents.OnBuildView?.Invoke(viewData);
+
+        var resultServerLogList = await Task.Run(() =>
+        {
+            var serverLogList = new List<NDT.ServerLog>();
+            for (int j = 0; j < m_labData.iterAmount; j++)
+            {
+                var serverLog = ImitateServer();
+                if (serverLog == null)
+                {
+                    GameEvents.OnChangeUIStateAux?.Invoke(UIController.UIStateAux.Red);
+                    // m_progressBarGO.SetActive(false);
+                    return null;
+                }
+                serverLogList.Add(serverLog);
+
+                m_progressBarFillRate = Mathf.Lerp(0f, 0.5f, (float)j / m_labData.iterAmount);
+
+                if (cancelTokenSource.IsCancellationRequested)
+                    return null;
+            }
+
+            return serverLogList;
+        });
         
+        if(resultServerLogList == null)
+            return;
+
+        var TheData = new TheData();
+
+        var viewDataList = new List<NDT.ViewData>();
+        
+        
+
+        var theDataResult = await Task.Run(() =>
+        {
+            viewDataList.Add(processDataProbabilityGauss.GetViewData(resultServerLogList));
+            m_progressBarFillRate += 0.5f / 3f;
+            viewDataList.Add(processDataProbabilityErland5D.GetViewData(resultServerLogList));
+            m_progressBarFillRate += 0.5f / 3f;
+            viewDataList.Add(processDataProbabilityUx.GetViewData(resultServerLogList));
+            m_progressBarFillRate += 0.5f / 3f;
+
+            return viewDataList;
+        });
+        
+        if(resultServerLogList == null)
+            return; 
+
+        foreach (var theData in theDataResult)
+        {
+            GameEvents.OnBuildView?.Invoke(theData);
+        }
+        
+        // NDT.ViewData viewData;
+        // viewData = processDataProbabilityGauss.GetViewData(resultServerLogList);
+        // GameEvents.OnBuildView?.Invoke(viewData);
+        // viewData = processDataProbabilityErland5D.GetViewData(resultServerLogList);
+        // GameEvents.OnBuildView?.Invoke(viewData);
+        // viewData = processDataProbabilityUx.GetViewData(resultServerLogList);
+        // GameEvents.OnBuildView?.Invoke(viewData);
+        processDataProbabilityPprostoi.GetViewData(resultServerLogList, m_labData);
+        // GameEvents.OnBuildView?.Invoke(viewData);
         GameEvents.OnChangeAuxParamsView?.Invoke(++DataView.curParamsValuesCount, m_labData);
         
         GameEvents.OnChangeUIStateAux?.Invoke(UIController.UIStateAux.Green);
+        
+
+    }
+
+    private class TheData
+    {
+        public ProcessDataProbability processDataProbabilityGauss;
+        public ProcessDataProbability processDataProbabilityErland5D;
+
+        public ProcessDataProbabilityUx processDataProbabilityUx;
+
+        public TheData()
+        {
+            var processDataProbabilityGauss = new ProcessDataProbability(ProcessDataProbability.FuncEnum.Gauss);
+            var processDataProbabilityErland5D = new ProcessDataProbability(ProcessDataProbability.FuncEnum.Erland5D);
+        
+            var processDataProbabilityUx = new ProcessDataProbabilityUx();
+        }
+
+
     }
 
     // public void ImitateServerActivity()

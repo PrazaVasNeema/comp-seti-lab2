@@ -16,6 +16,6 @@ MonoBehaviour:
     lambda: 1
     D: 0.1
     mean: 1
-    std_dev: 1
+    std_dev: 1.1
     iterAmount: 100
-    k: 100
+    k: 1000
