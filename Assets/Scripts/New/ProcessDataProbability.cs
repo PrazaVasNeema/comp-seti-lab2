@@ -37,6 +37,7 @@ public class ProcessDataProbability
 
     public NDT.ViewData GetViewData(List<NDT.ServerLog> serverLogList)
     {
+        int valueCounter = -1;
         foreach (var serverLog in serverLogList)
         {
             foreach (var serverStatus in serverLog.serverStatusList)
@@ -60,6 +61,7 @@ public class ProcessDataProbability
                 }
 
                 densityDict[(int) (Mathf.Lerp(0, 99.9f,value / maxValue))]++;
+                valueCounter++;
             }
         }
 
@@ -70,7 +72,14 @@ public class ProcessDataProbability
 
         var viewData = FormViewDataInstance();
 
-        foreach (var density in densityDict)
+        var finalDict = new Dictionary<float, float>();
+        
+        for (int i = 0; i < 100; i++)
+        {
+            finalDict.Add(Mathf.Lerp(0, maxValue, (float) i / 99), (float) densityDict[i] / valueCounter);
+        }
+
+        foreach (var density in finalDict)
         {
             viewData.pointsList.Add(new NDT.ViewData.Points(density.Key, density.Value));
 

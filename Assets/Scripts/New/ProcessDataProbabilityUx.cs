@@ -53,13 +53,16 @@ public class ProcessDataProbabilityUx
         float sumValue = 0;
         
         // Debug.Log($"MaxCount: {maxCount}");
+
+        int i = 0;
         
         foreach (var density in densityDict)
         {
             sumValue += (float) density.Value / maxCount;
             // Debug.Log($"Sum value: {sumValue}");
-            sumDict.Add(density.Key, sumValue);
+            sumDict.Add(Mathf.Lerp(0, maxValue, (float) i / 99f), sumValue);
             // viewData.pointsList.Add(new NDT.ViewData.Points(density.Key, density.Value));
+            i++;
         }
         
         

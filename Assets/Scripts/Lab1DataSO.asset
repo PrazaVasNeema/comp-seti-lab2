@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Lab1DataSO
   m_EditorClassIdentifier: 
   m_data:
-    lambda: 1
+    lambda: 1.1
     D: 0.1
     mean: 1
-    std_dev: 1.1
-    iterAmount: 100
+    std_dev: 1.2
+    iterAmount: 1000
     k: 1000
