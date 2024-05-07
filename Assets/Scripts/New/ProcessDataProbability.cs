@@ -38,16 +38,18 @@ public class ProcessDataProbability
     public NDT.ViewData GetViewData(List<NDT.ServerLog> serverLogList)
     {
         int valueCounter = -1;
+
         foreach (var serverLog in serverLogList)
         {
             foreach (var serverStatus in serverLog.serverStatusList)
             {
                 ValidateMaxValue(serverStatus);
             }
-            if (chosenFunc == FuncEnum.Erland5D)
-            {
-                // Debug.Log($"maxValue: {maxValue}");
-            }
+        }
+
+        
+        foreach (var serverLog in serverLogList)
+        {
             foreach (var serverStatus in serverLog.serverStatusList)
             {
                 float value = GetNeededLogData(serverStatus);
@@ -59,16 +61,19 @@ public class ProcessDataProbability
                     // Debug.Log((value / maxValue));
                     // Debug.Log((int) (Mathf.Lerp(0, 99.9f,value / maxValue)));
                 }
+                
+                if (value == maxValue)
+                    Debug.Log($"value: {value}");
 
                 densityDict[(int) (Mathf.Lerp(0, 99.9f,value / maxValue))]++;
                 valueCounter++;
             }
         }
 
-        for (int i = 0; i < 100; i++)
-        {
-            densityDict[i] /= serverLogList.Count;
-        }
+        // for (int i = 0; i < 100; i++)
+        // {
+        //     densityDict[i] /= serverLogList.Count;
+        // }
 
         var viewData = FormViewDataInstance();
 
@@ -76,7 +81,7 @@ public class ProcessDataProbability
         
         for (int i = 0; i < 100; i++)
         {
-            finalDict.Add(Mathf.Lerp(0, maxValue, (float) i / 99), (float) densityDict[i] / valueCounter);
+            finalDict.Add(Mathf.Lerp(0, maxValue, (float) i / 99), densityDict[i]);
         }
 
         foreach (var density in finalDict)

@@ -249,7 +249,6 @@ public class Server : MonoBehaviour
             else
             {
                 serverTime = T2;
-                Bx = (float)ProbDistFuncModel.GenerateNormal(rng, m_labData.mean, m_labData.std_dev);
                 
                 serverLog.SetTaskFinishTime(curProcessedTask, serverTime);
                 
@@ -264,6 +263,8 @@ public class Server : MonoBehaviour
                     {
                         var newTaskFromBuffer = qBuffer.GetTaskRoundRobin();
                         curProcessedTask = newTaskFromBuffer;
+                        Bx = (float)ProbDistFuncModel.GenerateNormal(rng, m_labData.mean, m_labData.std_dev);
+
                         T2 = serverTime + Bx;
                         break;
                     }
