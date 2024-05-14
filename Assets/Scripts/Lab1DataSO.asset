@@ -17,5 +17,5 @@ MonoBehaviour:
     D: 0.1
     mean: 1
     std_dev: 1.5
-    iterAmount: 3000
+    iterAmount: 1000
     k: 1000

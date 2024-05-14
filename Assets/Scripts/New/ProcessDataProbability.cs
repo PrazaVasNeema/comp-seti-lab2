@@ -70,10 +70,10 @@ public class ProcessDataProbability
             }
         }
 
-        // for (int i = 0; i < 100; i++)
-        // {
-        //     densityDict[i] /= serverLogList.Count;
-        // }
+        for (int i = 0; i < 100; i++)
+        {
+            densityDict[i] /= serverLogList.Count;
+        }
 
         var viewData = FormViewDataInstance();
 
