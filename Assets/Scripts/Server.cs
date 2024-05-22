@@ -314,6 +314,8 @@ public class Server : MonoBehaviour
         
         return serverLog;
     }
+    
+    
 
     private void SetDependencyValue(Lab1DataSO.DependencyValue lab1DDependencyValue, float value)
     {

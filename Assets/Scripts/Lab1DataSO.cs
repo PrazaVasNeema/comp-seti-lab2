@@ -44,7 +44,13 @@ public class Lab1DataSO : ScriptableObject
         // public InvestigatedValue investigatedValue;
         // [Header("График зависит от параметра:")]
         // public DependencyValue dependencyValue;
-
+        
+        [Header("Количество серверов")] 
+        public int nodesCount;
+        
+        [Header("Вероятность передачи задания")] 
+        [Range(0,1)]
+        public float pToPassTask;
 
     }
 }
