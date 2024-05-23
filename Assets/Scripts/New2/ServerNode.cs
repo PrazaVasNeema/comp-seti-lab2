@@ -32,7 +32,7 @@ public class ServerNode
     private float Bx;
     int totalIters = 0;
 
-    private NDT.ServerLog thisServerLog;
+    public NDT.ServerLog thisServerLog;
 
 
     public void FillServerNeighbours(List<ServerNode> neighboursList)
@@ -73,7 +73,7 @@ public class ServerNode
             var newTask = new NDT.TaskData{num = overseer.totalTaskCount, arrivalTime = overseer.serverTime};
             serverLog.alltimeTaskList.Add(newTask);
 
-            if (qBuffer.bufferCount == 0)
+            if (qBuffer.bufferCount == 0 && curProcessedTask == null)
             {
                 Bx = GetBx();
                 
@@ -91,6 +91,7 @@ public class ServerNode
         }
         else
         {
+            // Debug.Log($"curProcessedTask = {curProcessedTask}");
             serverLog.SetTaskFinishTime(curProcessedTask, overseer.serverTime);
             
             DecideTaskDestiny(curProcessedTask);
@@ -217,7 +218,15 @@ public class ServerNode
         {
             float totalTaskTime = 0f;
             int tasksCounter = 0;
-        
+
+            if (neighbour.thisServerLog.alltimeTaskList.Count == 0)
+            {
+                // minProcessTimeNode = neighbour;
+                // break;
+                continue;
+            }
+            
+            // Else normal case
             foreach (var taskData in neighbour.thisServerLog.alltimeTaskList)
             {
                 if (taskData.finishTime == -1f)
@@ -227,6 +236,7 @@ public class ServerNode
             }
             
             var thisTime = totalTaskTime / tasksCounter;
+            // Debug.Log($"thisTime = {thisTime}");
             if (thisTime < minProcessTime)
             {
                 minProcessTime = thisTime;
@@ -234,7 +244,8 @@ public class ServerNode
             }
         }
         
-        minProcessTimeNode.AddTaskToBuffer(task);
+        if (minProcessTimeNode != null)
+            minProcessTimeNode.AddTaskToBuffer(task);
     }
     
 }

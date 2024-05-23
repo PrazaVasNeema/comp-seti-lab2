@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class NetworkOverseer : MonoBehaviour
 {
@@ -44,6 +45,16 @@ public class NetworkOverseer : MonoBehaviour
     public int totalTaskCount { get; private set; }
     public int processedTaskCount { get; private set; }
 
+    [SerializeField] private GameObject m_progressBarGO;
+    [SerializeField] private Image m_progressBar;
+    private void Update()
+    {
+        if (Time.frameCount % 10 == 0)
+        {
+            m_progressBar.fillAmount = m_progressBarFillRate;
+        }
+    }
+    
     public void IncreaseTotalTaskCount()
     {
         totalTaskCount++;
@@ -67,13 +78,19 @@ public class NetworkOverseer : MonoBehaviour
         }
         else
         {
+            bool notFound = true;
             for(int i = eventQueueList.Count -1; i >= 1; i--)
             {
                 if (eventData.expectedTime > eventQueueList[i].expectedTime && eventData.expectedTime < eventQueueList[i-1].expectedTime)
                 {
                     eventQueueList.Insert(i, eventData);
+                    notFound = false;
                     break;
                 }
+            }
+            if (notFound)
+            {
+                eventQueueList.Insert(0, eventData);
             }
         }
     }
@@ -138,10 +155,12 @@ public class NetworkOverseer : MonoBehaviour
 
     public async void DoEmulation()
     {
+        GameEvents.OnChangeUIStateAux?.Invoke(UIController.UIStateAux.Grey);
+
         resultServerLogListDict = new Dictionary<int, List<NDT.ServerLog>>();
         m_progressBarFillRate = 0f;
 
-        TotalClearData();
+        // TotalClearData();
         
         resultServerLogListDict = await Task.Run(() =>
         {
@@ -163,12 +182,16 @@ public class NetworkOverseer : MonoBehaviour
                     AddEvent(eventData);
 
                     serverLogListDict[i].Add(new NDT.ServerLog());
+
+                    serverNodes[i].thisServerLog = serverLogListDict[i][j];
                 }
 
                 while (processedTaskCount < labData.k)
                 {
+                    // Debug.Log($"eventQueueList.Count = {eventQueueList.Count}");
                     var eventData = eventQueueList[^1];
-                    SetCurrentClosestEventTime(eventQueueList[^2].expectedTime);
+                    eventQueueList.RemoveAt(eventQueueList.Count - 1);
+                    currentClosestEventTime = eventQueueList[^1].expectedTime;
                     // get index of the serverNode from eventData in the serverNodes list
 
                     var serverNodeIndex = serverNodes.FindIndex(x => x == eventData.serverNode);
@@ -178,20 +201,22 @@ public class NetworkOverseer : MonoBehaviour
 
                     bool isGood = eventData.serverNode.DoTask(eventData.eventType, ref serverLog, this);
 
-                    if (isGood)
+                    if (!isGood)
                     {
-                        GameEvents.OnChangeUIStateAux?.Invoke(UIController.UIStateAux.Red);
                         // m_progressBarGO.SetActive(false);
                         return null;
                     }
 
-                    eventQueueList.RemoveAt(eventQueueList.Count - 1);
                     // m_progressBarFillRate = Mathf.Lerp(0f, 0.5f, (float)j / m_labData.iterAmount);
-                    m_progressBarFillRate = Mathf.Lerp(0f, 1f, processedTaskCount / labData.k);
+                    
+                    // Debug.Log($"processedTaskCount = {processedTaskCount}");
 
                     if (cancelTokenSource.IsCancellationRequested)
                         return null;
                 }
+                
+                m_progressBarFillRate = Mathf.Lerp(0f, 0.5f, (float) j / labData.iterAmount);
+
 
             }
 
@@ -199,12 +224,22 @@ public class NetworkOverseer : MonoBehaviour
         });
         
         // !!
-        
+
+        if (resultServerLogListDict == null)
+        {
+            GameEvents.OnChangeUIStateAux?.Invoke(UIController.UIStateAux.Red);
+
+            return;
+        }
+
+
         Debug.Log("Done!");
         
         var processDataProbabilityGauss = new ProcessDataProbability(ProcessDataProbability.FuncEnum.Gauss);
         var processDataProbabilityErland5D = new ProcessDataProbability(ProcessDataProbability.FuncEnum.Erland5D);
         var processDataProbabilityUx = new ProcessDataProbabilityUx();
+        var processDataProbabilityPprostoi = new ProcessDataProbabilityPprostoi();
+
         
         var viewDataList = new List<NDT.ViewData>();
         
@@ -216,6 +251,8 @@ public class NetworkOverseer : MonoBehaviour
                 viewDataList.Add(processDataProbabilityGauss.GetViewData(resultServerLogListDict[i]));
                 viewDataList.Add(processDataProbabilityErland5D.GetViewData(resultServerLogListDict[i]));
                 viewDataList.Add(processDataProbabilityUx.GetViewData(resultServerLogListDict[i]));
+                processDataProbabilityPprostoi.GetViewData(resultServerLogListDict[i], labData);
+
                 m_progressBarFillRate += iterStep;
             }
             
@@ -223,15 +260,14 @@ public class NetworkOverseer : MonoBehaviour
             return viewDataList;
         });
             
-        if(resultServerLogListDict == null)
-            return; 
+
         
         // !!
         
-        foreach (var theData in theDataResult)
-        {
-            GameEvents.OnBuildView?.Invoke(theData);
-        }
+        // foreach (var theData in theDataResult)
+        // {
+        //     GameEvents.OnBuildView?.Invoke(theData);
+        // }
         
         GameEvents.OnChangeAuxParamsView?.Invoke(++DataView.curParamsValuesCount, labData);
         

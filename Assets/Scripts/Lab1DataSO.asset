@@ -19,3 +19,5 @@ MonoBehaviour:
     std_dev: 2
     iterAmount: 10000
     k: 1000
+    nodesCount: 5
+    pToPassTask: 0.545

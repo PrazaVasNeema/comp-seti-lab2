@@ -5,6 +5,5 @@ using UnityEngine;
 public class Analyzer : MonoBehaviour
 {
 
-    public 
     
 }
