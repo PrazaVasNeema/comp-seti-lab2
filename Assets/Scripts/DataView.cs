@@ -38,12 +38,14 @@ public class DataView : MonoBehaviour
     {
         GameEvents.OnBuildView += UpdateChart;
         GameEvents.OnClearViewData += RemoveAllViewData;
+        GameEvents.OnClearAllAuxParams += OnClearAuxParamsView;
     }
 
     private void OnDisable()
     {
         GameEvents.OnBuildView -= UpdateChart;
         GameEvents.OnClearViewData -= RemoveAllViewData;
+        GameEvents.OnClearAllAuxParams -= OnClearAuxParamsView;
     }
 
     private void UpdateChart(NDT.ViewData viewData)
@@ -94,12 +96,7 @@ public class DataView : MonoBehaviour
     
     public void RemoveViewData()
     {
-        for (int i = curParamsValuesCount; i > 0; i--)
-        {
-            GameEvents.OnClearAuxParamsView?.Invoke(i);
-        }
         m_LineChart.RemoveData();
-        curParamsValuesCount = 0;
     }
     
     public void RemoveAllViewData()
@@ -114,5 +111,14 @@ public class DataView : MonoBehaviour
 
             chart.RemoveViewData();
         }
+    }
+
+    public void OnClearAuxParamsView()
+    {
+        for (int i = curParamsValuesCount; i > 0; i--)
+        {
+            GameEvents.OnClearAuxParamsView?.Invoke(i);
+        }
+        curParamsValuesCount = 0;
     }
 }

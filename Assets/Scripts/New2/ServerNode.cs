@@ -34,12 +34,21 @@ public class ServerNode
 
     public NDT.ServerLog thisServerLog;
 
+    public int thisID = -1;
 
     public void FillServerNeighbours(List<ServerNode> neighboursList)
     {
+        nodeNeighbours = new List<ServerNode>();
         
         nodeNeighbours = neighboursList;
+
+        var str = "";
+        foreach (var VARIABLE in neighboursList)
+        {
+            str += VARIABLE.thisID + " ";
+        }
         
+        Debug.Log($"This is {thisID}, My neighbours are: {str}");
     }
 
     public void ClearServerData()
@@ -54,6 +63,7 @@ public class ServerNode
         
         qBuffer = new NDT.QBuffer();
         curProcessedTask = null;
+
 
     }
 

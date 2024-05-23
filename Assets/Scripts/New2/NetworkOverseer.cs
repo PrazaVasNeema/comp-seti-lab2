@@ -120,11 +120,12 @@ public class NetworkOverseer : MonoBehaviour
 
     private void InitializeEmulation()
     {
-
+        serverNodes = new List<ServerNode>();
         for (int i = 0; i < labData.nodesCount; i++)
         {
             var newServerNode = new ServerNode();
             serverNodes.Add(newServerNode);
+            newServerNode.thisID = i;
 
             var eventData = new EventData(newServerNode, NDT.ServerLog.EventType.T1, newServerNode.GetAx());
             

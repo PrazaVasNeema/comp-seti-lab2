@@ -18,4 +18,7 @@ public class GameEvents : MonoBehaviour
 
     public static System.Action OnDoFullProcess;
 
+    public static System.Action OnClearAllAuxParams;
+
+
 }

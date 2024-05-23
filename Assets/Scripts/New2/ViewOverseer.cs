@@ -52,7 +52,6 @@ public class ViewOverseer : MonoBehaviour
     
     public void OnStartEmulation()
     {
-        GameEvents.OnClearViewData?.Invoke();
 
         ClearInterExpData();
         
@@ -64,7 +63,8 @@ public class ViewOverseer : MonoBehaviour
     {
         ClearInterExpData();
         
-        m_nodesNeighboursList = new List<List<int>>();
+        GameEvents.OnClearAllAuxParams?.Invoke();
+        
         m_nodeViewDataList = new List<List<NodeViewData>>();
     }
     
@@ -72,6 +72,8 @@ public class ViewOverseer : MonoBehaviour
     
     private void ClearInterExpData()
     {
+        GameEvents.OnClearViewData?.Invoke();
+        
         m_nodesDropdown.ClearOptions();
         var options = new List<string>();
         options.Add($"Select a Node if any");
@@ -80,6 +82,8 @@ public class ViewOverseer : MonoBehaviour
         
         m_neighboursText.text = "";
         m_currentNodeIndex = -1;
+        m_nodesNeighboursList = new List<List<int>>();
+
     }
     
     // ----
@@ -89,8 +93,10 @@ public class ViewOverseer : MonoBehaviour
 
     public void OnUpdateNodeData()
     {
-        if (m_currentNodeIndex == -1)
+        if (m_nodesDropdown.value == 0)
             return;
+
+        m_currentNodeIndex = m_nodesDropdown.value - 1;
         
         string neighboursFinalText = "";
         foreach (var neighbourId in m_nodesNeighboursList[m_currentNodeIndex])
