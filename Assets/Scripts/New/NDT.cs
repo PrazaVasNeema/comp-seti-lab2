@@ -158,6 +158,18 @@ public class NDT
             this.type = type;
             this.targetView = targetView;
         }
+
+        public static List<ViewData> GetEmptyViewDataList()
+        {
+            var output = new List<ViewData>();
+            foreach (TargetView targetView in Enum.GetValues(typeof(TargetView)))
+            {
+                output.Add(new ViewData(ViewType.Chart, targetView));
+                output[^1].pointsList.Add(new Points(0, 0));
+            }
+
+            return output;
+        }
     }
 }
 

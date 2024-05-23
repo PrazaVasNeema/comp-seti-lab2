@@ -108,7 +108,14 @@ public class NetworkOverseer : MonoBehaviour
     private void Start()
     {
         cancelTokenSource = new CancellationTokenSource();
+        
+        GameEvents.OnDoFullProcess += DoFullProcess;
+    }
+
+    private void DoFullProcess()
+    {
         InitializeEmulation();
+        DoEmulation();
     }
 
     private void InitializeEmulation()
@@ -137,12 +144,20 @@ public class NetworkOverseer : MonoBehaviour
         neighboursList.Add(serverNodes[1]);
         serverNodes[0].FillServerNeighbours(neighboursList);
         
+        var neighbourIdList = new List<List<int>>();
+        neighbourIdList.Add(new List<int>());
+        neighbourIdList[0].Add(1);
+        
         for (int i = 1; i < serverNodes.Count - 1; i++)
         {
             neighboursList = new List<ServerNode>();
             neighboursList.Add(serverNodes[i - 1]);
             neighboursList.Add(serverNodes[i + 1]);
             serverNodes[i].FillServerNeighbours(neighboursList);
+            
+            neighbourIdList.Add(new List<int>());
+            neighbourIdList[i].Add(i-1);
+            neighbourIdList[i].Add(i+1);
         }
         
         // ??
@@ -151,6 +166,10 @@ public class NetworkOverseer : MonoBehaviour
         neighboursList.Add(serverNodes[^2]);
         serverNodes[^1].FillServerNeighbours(neighboursList);
         
+        neighbourIdList.Add(new List<int>());
+        neighbourIdList[^1].Add(serverNodes.Count - 1);
+        
+        GameEvents.OnInitNodes?.Invoke(neighbourIdList);
     }
 
     public async void DoEmulation()
@@ -240,24 +259,28 @@ public class NetworkOverseer : MonoBehaviour
         var processDataProbabilityUx = new ProcessDataProbabilityUx();
         var processDataProbabilityPprostoi = new ProcessDataProbabilityPprostoi();
 
+
         
-        var viewDataList = new List<NDT.ViewData>();
         
         var theDataResult = await Task.Run(() =>
         {
+            var nodeViewDataList = new List<ViewOverseer.NodeViewData>();
+
             float iterStep = 0.5f / serverNodes.Count; 
             for (int i = 0; i < serverNodes.Count; i++)
             {
-                viewDataList.Add(processDataProbabilityGauss.GetViewData(resultServerLogListDict[i]));
-                viewDataList.Add(processDataProbabilityErland5D.GetViewData(resultServerLogListDict[i]));
-                viewDataList.Add(processDataProbabilityUx.GetViewData(resultServerLogListDict[i]));
+                nodeViewDataList.Add(new ViewOverseer.NodeViewData());
+                
+                nodeViewDataList[i].viewDataList.Add(processDataProbabilityGauss.GetViewData(resultServerLogListDict[i]));
+                nodeViewDataList[i].viewDataList.Add(processDataProbabilityErland5D.GetViewData(resultServerLogListDict[i]));
+                nodeViewDataList[i].viewDataList.Add(processDataProbabilityUx.GetViewData(resultServerLogListDict[i]));
                 processDataProbabilityPprostoi.GetViewData(resultServerLogListDict[i], labData);
 
                 m_progressBarFillRate += iterStep;
             }
             
 
-            return viewDataList;
+            return nodeViewDataList;
         });
             
 
@@ -269,6 +292,8 @@ public class NetworkOverseer : MonoBehaviour
         //     GameEvents.OnBuildView?.Invoke(theData);
         // }
         
+        GameEvents.OnLoadDataViewOverseer?.Invoke(theDataResult);
+        
         GameEvents.OnChangeAuxParamsView?.Invoke(++DataView.curParamsValuesCount, labData);
         
         GameEvents.OnChangeUIStateAux?.Invoke(UIController.UIStateAux.Green);
@@ -278,6 +303,7 @@ public class NetworkOverseer : MonoBehaviour
     private void OnDestroy()
     {
         cancelTokenSource.Cancel();
+        GameEvents.OnDoFullProcess -= DoFullProcess;
     }
 
     private void TotalClearData()

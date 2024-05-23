@@ -37,11 +37,13 @@ public class DataView : MonoBehaviour
     private void OnEnable()
     {
         GameEvents.OnBuildView += UpdateChart;
+        GameEvents.OnClearViewData += RemoveAllViewData;
     }
 
     private void OnDisable()
     {
         GameEvents.OnBuildView -= UpdateChart;
+        GameEvents.OnClearViewData -= RemoveAllViewData;
     }
 
     private void UpdateChart(NDT.ViewData viewData)
