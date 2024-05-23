@@ -92,6 +92,8 @@ public class ServerNode
         else
         {
             serverLog.SetTaskFinishTime(curProcessedTask, overseer.serverTime);
+            
+            DecideTaskDestiny(curProcessedTask);
 
             switch (qBuffer.bufferCount)
             {
@@ -163,6 +165,13 @@ public class ServerNode
     //     
     // }
 
+    public NetworkOverseer.EventData GenerateEvent(NDT.ServerLog.EventType eventType)
+    {
+        float increasingValue = eventType == NDT.ServerLog.EventType.T1 ? GetAx() : GetBx();
+        
+        return new NetworkOverseer.EventData(this, eventType, NetworkOverseer.Instance.serverTime + increasingValue);
+    }
+    
     public float GetAx()
     {
         return (float) ProbDistFuncModel.GenerateErlang(rng, 5, NetworkOverseer.Instance.labData.lambda, NetworkOverseer.Instance.labData.D);

@@ -139,13 +139,9 @@ public class NetworkOverseer : MonoBehaviour
     public async void DoEmulation()
     {
         resultServerLogListDict = new Dictionary<int, List<NDT.ServerLog>>();
-        
-        for (int i = 0; i < serverNodes.Count; i++)
-        {
-            serverNodes[i].ClearServerData();
-        }
-        
-        serverTime = 0f;
+        m_progressBarFillRate = 0f;
+
+        TotalClearData();
         
         resultServerLogListDict = await Task.Run(() =>
         {
@@ -156,34 +152,47 @@ public class NetworkOverseer : MonoBehaviour
                 // serverLogListDict[i].Add(new NDT.ServerLog());
                 serverLogListDict.Add(i, new List<NDT.ServerLog>());
             }
-            
 
-            while (processedTaskCount < labData.k)
+
+            for (int j = 0; j < labData.iterAmount; j++)
             {
-                var eventData = eventQueueList[^1];
-                SetCurrentClosestEventTime(eventQueueList[^2].expectedTime);
-                // get index of the serverNode from eventData in the serverNodes list
-                
-                var serverNodeIndex = serverNodes.FindIndex(x => x == eventData.serverNode);
-                var serverLog = serverLogListDict[serverNodeIndex][0];
-
-                serverTime = eventData.expectedTime;
-                
-                bool isGood = eventData.serverNode.DoTask(eventData.eventType, ref serverLog, this);
-                
-                if (isGood)
+                TotalClearData();
+                for (int i = 0; i < serverNodes.Count; i++)
                 {
-                    GameEvents.OnChangeUIStateAux?.Invoke(UIController.UIStateAux.Red);
-                    // m_progressBarGO.SetActive(false);
-                    return null;
-                }
-                
-                eventQueueList.RemoveAt(eventQueueList.Count - 1);
-                // m_progressBarFillRate = Mathf.Lerp(0f, 0.5f, (float)j / m_labData.iterAmount);
-                m_progressBarFillRate = Mathf.Lerp(0f, 1f, processedTaskCount / labData.k);
+                    var eventData = new EventData(serverNodes[i], NDT.ServerLog.EventType.T1, serverNodes[i].GetAx());
+                    AddEvent(eventData);
 
-                if (cancelTokenSource.IsCancellationRequested)
-                    return null;
+                    serverLogListDict[i].Add(new NDT.ServerLog());
+                }
+
+                while (processedTaskCount < labData.k)
+                {
+                    var eventData = eventQueueList[^1];
+                    SetCurrentClosestEventTime(eventQueueList[^2].expectedTime);
+                    // get index of the serverNode from eventData in the serverNodes list
+
+                    var serverNodeIndex = serverNodes.FindIndex(x => x == eventData.serverNode);
+                    var serverLog = serverLogListDict[serverNodeIndex][j];
+
+                    serverTime = eventData.expectedTime;
+
+                    bool isGood = eventData.serverNode.DoTask(eventData.eventType, ref serverLog, this);
+
+                    if (isGood)
+                    {
+                        GameEvents.OnChangeUIStateAux?.Invoke(UIController.UIStateAux.Red);
+                        // m_progressBarGO.SetActive(false);
+                        return null;
+                    }
+
+                    eventQueueList.RemoveAt(eventQueueList.Count - 1);
+                    // m_progressBarFillRate = Mathf.Lerp(0f, 0.5f, (float)j / m_labData.iterAmount);
+                    m_progressBarFillRate = Mathf.Lerp(0f, 1f, processedTaskCount / labData.k);
+
+                    if (cancelTokenSource.IsCancellationRequested)
+                        return null;
+                }
+
             }
 
             return serverLogListDict;
@@ -235,9 +244,23 @@ public class NetworkOverseer : MonoBehaviour
         cancelTokenSource.Cancel();
     }
 
-    private void ClearData()
+    private void TotalClearData()
     {
-        
+        eventQueueList = new List<EventData>();
+        currentClosestEventTime = float.MaxValue;
+        serverTime = 0f;
+        totalTaskCount = 0;
+        processedTaskCount = 0;
+
+        ClearServerNodesData();
+    }
+
+    private void ClearServerNodesData()
+    {
+        for (int i = 0; i < serverNodes.Count; i++)
+        {
+            serverNodes[i].ClearServerData();
+        }
     }
     
 }
