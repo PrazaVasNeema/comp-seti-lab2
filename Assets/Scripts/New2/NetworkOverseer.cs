@@ -166,6 +166,9 @@ public class NetworkOverseer : MonoBehaviour
                 
                 var serverNodeIndex = serverNodes.FindIndex(x => x == eventData.serverNode);
                 var serverLog = serverLogListDict[serverNodeIndex][0];
+
+                serverTime = eventData.expectedTime;
+                
                 bool isGood = eventData.serverNode.DoTask(eventData.eventType, ref serverLog, this);
                 
                 if (isGood)
@@ -175,6 +178,7 @@ public class NetworkOverseer : MonoBehaviour
                     return null;
                 }
                 
+                eventQueueList.RemoveAt(eventQueueList.Count - 1);
                 // m_progressBarFillRate = Mathf.Lerp(0f, 0.5f, (float)j / m_labData.iterAmount);
                 m_progressBarFillRate = Mathf.Lerp(0f, 1f, processedTaskCount / labData.k);
 
@@ -213,6 +217,8 @@ public class NetworkOverseer : MonoBehaviour
         if(resultServerLogListDict == null)
             return; 
         
+        // !!
+        
         foreach (var theData in theDataResult)
         {
             GameEvents.OnBuildView?.Invoke(theData);
@@ -224,7 +230,10 @@ public class NetworkOverseer : MonoBehaviour
         
     }
     
-    
+    private void OnDestroy()
+    {
+        cancelTokenSource.Cancel();
+    }
 
     private void ClearData()
     {
