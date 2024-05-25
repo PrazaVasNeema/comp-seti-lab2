@@ -14,6 +14,8 @@ public class AuxParamsValues : MonoBehaviour
     [SerializeField] private TMP_Text D;
     [SerializeField] private TMP_Text mean;
     [SerializeField] private TMP_Text std_dev;
+    [SerializeField] private TMP_Text nodesCount;
+    [SerializeField] private TMP_Text pPeredachi;
 
 
     private void OnEnable()
@@ -40,6 +42,8 @@ public class AuxParamsValues : MonoBehaviour
             D.text = arg2.D.ToString();
             mean.text = arg2.mean.ToString();
             std_dev.text = arg2.std_dev.ToString();
+            nodesCount.text = arg2.nodesCount.ToString();
+            pPeredachi.text = arg2.pToPassTask.ToString();
         }
     }
     
