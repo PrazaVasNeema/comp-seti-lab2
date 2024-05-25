@@ -38,6 +38,11 @@ public class NDT
         // All time tasks data
         public List<TaskData> alltimeTaskList = new List<TaskData>();
         // A method to set finish time for a task in the tasksList with a certain num
+        public int allTimeIncomeTasksCount = 0;
+        public void IncreaseAllTimeIncomeTasksCount()
+        {
+            allTimeIncomeTasksCount++;
+        }
         public void SetTaskFinishTime(TaskData curTask, float finishTime)
         {
             try
@@ -80,9 +85,15 @@ public class NDT
     }
     public class QBuffer
     {
+        public int maxBufferSize;
         private List<TaskData> qContentsList = new List<TaskData>();
         private int currentIndex = 0;
         public int bufferCount => qContentsList.Count;
+        
+        public QBuffer(int maxBufferSize)
+        {
+            this.maxBufferSize = maxBufferSize;
+        }
         public TaskData RemoveTask(int taskNum)
         {
             var output = qContentsList.Find(x => x.num == taskNum);
@@ -107,12 +118,13 @@ public class NDT
         }
         public void AddTask(TaskData qContent)
         {
-            qContentsList.Add(qContent);
+            if(bufferCount < maxBufferSize)
+                qContentsList.Add(qContent);
         }
         // Method to clone data into another instance of that class
         public QBuffer Clone()
         {
-            QBuffer newQBuffer = new QBuffer();
+            QBuffer newQBuffer = new QBuffer(maxBufferSize);
             newQBuffer.qContentsList = new List<TaskData>(qContentsList);
             newQBuffer.currentIndex = currentIndex;
             return newQBuffer;

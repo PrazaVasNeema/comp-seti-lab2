@@ -27,7 +27,7 @@ public class ProcessDataProbabilityPprostoi
         }
     }
 
-    public void GetViewData(List<NDT.ServerLog> serverLogList, Lab1DataSO.Data lab1Data)
+    public void GetViewData(List<NDT.ServerLog> serverLogList, Lab1DataSO.Data lab1Data, int NodeId)
     {
         
         float timeProstoi = 0f;
@@ -64,7 +64,7 @@ public class ProcessDataProbabilityPprostoi
 
         Pprostoi /= serverLogList.Count;
 
-        result = "lambda: " + lab1Data.lambda + ", " + "D: " + lab1Data.D + ", " + "mean: " + lab1Data.mean + ", " + "std_dev: " + lab1Data.std_dev + ", " + "Pprostoi: " + Pprostoi;
+        result = "SERVER NODE ID: " + NodeId +"lambda: " + lab1Data.lambda + ", " + "D: " + lab1Data.D + ", " + "mean: " + lab1Data.mean + ", " + "std_dev: " + lab1Data.std_dev + ", " + "Pprostoi: " + Pprostoi;
         
         Debug.Log($"Result: {result}");
 

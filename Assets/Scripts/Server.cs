@@ -126,7 +126,7 @@ public class Server : MonoBehaviour
         // GameEvents.OnBuildView?.Invoke(viewData);
         // viewData = processDataProbabilityUx.GetViewData(resultServerLogList);
         // GameEvents.OnBuildView?.Invoke(viewData);
-        processDataProbabilityPprostoi.GetViewData(resultServerLogList, m_labData);
+        // processDataProbabilityPprostoi.GetViewData(resultServerLogList, m_labData);
         // GameEvents.OnBuildView?.Invoke(viewData);
         GameEvents.OnChangeAuxParamsView?.Invoke(++DataView.curParamsValuesCount, m_labData);
         
@@ -188,7 +188,7 @@ public class Server : MonoBehaviour
         float T1;
         float T2 = float.MaxValue;
         bool serverIsBusy = false;
-        var qBuffer = new NDT.QBuffer();
+        var qBuffer = new NDT.QBuffer(m_qMaxSize);
         int compTasksCount = 0;
         int totalTasksCount = 0;
 
@@ -238,10 +238,7 @@ public class Server : MonoBehaviour
                 }
                 else
                 {
-                    if (qBuffer.bufferCount < m_qMaxSize)
-                    {
-                        qBuffer.AddTask(newTask);
-                    }
+                    qBuffer.AddTask(newTask);
                 }
 
                 TIP = NDT.ServerLog.EventType.T1;

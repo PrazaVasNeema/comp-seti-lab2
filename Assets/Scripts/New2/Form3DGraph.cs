@@ -35,6 +35,8 @@ public class Form3DGraph : MonoBehaviour
     {
         foreach (var child in nodesParent.transform.GetComponentsInChildren<Transform>())
         {
+            if (child == nodesParent.transform)
+                continue;
             Destroy(child.gameObject);
         }
     }
@@ -48,8 +50,10 @@ public class Form3DGraph : MonoBehaviour
         {
             var node = Instantiate(pointPrefab, new Vector3(nodeDataList[i].Coords.x * multiplier, nodeDataList[i].Coords.y * multiplier, 0), Quaternion.identity);
             
+            node.transform.SetParent(nodesParent.transform);
             node.LoadData(i);
             nodes.Add(node);
+            
         }
 
         

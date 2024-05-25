@@ -13,7 +13,6 @@ public class ServerNode
     
     private List<ServerNode> nodeNeighbours = new List<ServerNode>();
     
-    NDT.QBuffer qBuffer = new NDT.QBuffer();
     // int compTasksCount = 0;
     int totalTasksIncomeCount = 0;
     Random rng = new System.Random();
@@ -27,6 +26,10 @@ public class ServerNode
     private float Mtau = 0;
     private float Msigma = 0;
     private int m_qMaxSize = 8;
+    NDT.QBuffer qBuffer = new NDT.QBuffer(8);
+    
+    private int totalIncomeTasksCount = 0;
+
 
     private float Ax;
     private float Bx;
@@ -61,8 +64,9 @@ public class ServerNode
         Msigma = 0;
         totalIters = 0;
         
-        qBuffer = new NDT.QBuffer();
+        qBuffer = new NDT.QBuffer(8);
         curProcessedTask = null;
+        totalIncomeTasksCount = 0;
 
 
     }
@@ -199,6 +203,7 @@ public class ServerNode
     public void AddTaskToBuffer(NDT.TaskData task)
     {
         qBuffer.AddTask(task);
+        thisServerLog.allTimeIncomeTasksCount++;
     }
     
     private void DecideTaskDestiny(NDT.TaskData task)
@@ -253,9 +258,11 @@ public class ServerNode
                 minProcessTimeNode = neighbour;
             }
         }
-        
+
         if (minProcessTimeNode != null)
+        {
             minProcessTimeNode.AddTaskToBuffer(task);
+        }
     }
     
 }

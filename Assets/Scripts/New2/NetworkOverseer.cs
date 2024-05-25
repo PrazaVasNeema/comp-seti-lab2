@@ -288,6 +288,8 @@ public class NetworkOverseer : MonoBehaviour
         var processDataProbabilityErland5D = new ProcessDataProbability(ProcessDataProbability.FuncEnum.Erland5D);
         var processDataProbabilityUx = new ProcessDataProbabilityUx();
         var processDataProbabilityPprostoi = new ProcessDataProbabilityPprostoi();
+        var processDataProbabilityCIntensity = new ProcessDataProbabilityCIntensity();
+
 
 
         
@@ -308,7 +310,9 @@ public class NetworkOverseer : MonoBehaviour
                 nodeViewDataList[i].viewDataList.Add(processDataProbabilityGauss.GetViewData(resultServerLogListDict[i]));
                 nodeViewDataList[i].viewDataList.Add(processDataProbabilityErland5D.GetViewData(resultServerLogListDict[i]));
                 nodeViewDataList[i].viewDataList.Add(processDataProbabilityUx.GetViewData(resultServerLogListDict[i]));
-                processDataProbabilityPprostoi.GetViewData(resultServerLogListDict[i], labData);
+                processDataProbabilityPprostoi.GetViewData(resultServerLogListDict[i], labData, serverNodes[i].thisID);
+                processDataProbabilityCIntensity.GetViewData(resultServerLogListDict[i], labData, serverNodes[i].thisID, serverTime);
+
 
                 m_progressBarFillRate += iterStep;
             }
