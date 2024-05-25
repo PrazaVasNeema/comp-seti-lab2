@@ -11,6 +11,14 @@ public class ProcessDataProbabilityUx
 
     public ProcessDataProbabilityUx()
     {
+
+    }
+    
+    public void ClearData()
+    {
+        
+        maxValue = 0;
+        
         densityDict = new Dictionary<int, int>();
         for (int i = 0; i < 100; i++)
         {

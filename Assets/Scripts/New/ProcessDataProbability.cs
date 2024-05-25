@@ -21,6 +21,13 @@ public class ProcessDataProbability
     {
         this.chosenFunc = chosenFunc;
 
+    }
+
+    public void ClearData()
+    {
+        
+        maxValue = 0;
+        
         densityDict = new Dictionary<int, int>();
         for (int i = 0; i < 100; i++)
         {

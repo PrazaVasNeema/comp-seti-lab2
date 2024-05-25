@@ -272,6 +272,10 @@ public class NetworkOverseer : MonoBehaviour
             {
                 nodeViewDataList.Add(new ViewOverseer.NodeViewData());
                 
+                processDataProbabilityGauss.ClearData();
+                processDataProbabilityErland5D.ClearData();
+                processDataProbabilityUx.ClearData();
+                    
                 nodeViewDataList[i].viewDataList.Add(processDataProbabilityGauss.GetViewData(resultServerLogListDict[i]));
                 nodeViewDataList[i].viewDataList.Add(processDataProbabilityErland5D.GetViewData(resultServerLogListDict[i]));
                 nodeViewDataList[i].viewDataList.Add(processDataProbabilityUx.GetViewData(resultServerLogListDict[i]));
