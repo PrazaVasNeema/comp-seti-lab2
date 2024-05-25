@@ -106,6 +106,11 @@ public class ViewOverseer : MonoBehaviour
     {
         m_currentNodeIndex = index;
         
+        if (m_nodesDropdown.value != m_currentNodeIndex)
+        {
+            m_nodesDropdown.value = m_currentNodeIndex + 1;
+        }
+        
         string neighboursFinalText = "";
         foreach (var neighbourId in m_nodesNeighboursList[m_currentNodeIndex])
         {

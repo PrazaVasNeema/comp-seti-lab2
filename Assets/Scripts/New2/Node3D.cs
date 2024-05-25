@@ -1,13 +1,15 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 public class Node3D : MonoBehaviour
 {
     public Material highlightMaterial; // Assign the highlight material in the inspector
-    
+
+    [SerializeField] private TMP_Text idText;
     [SerializeField] private Vector3 offset = Vector3.up; // Offset for the text position
     [SerializeField] private Color lineColor = Color.white; // Color of the lines between the nodes
 
@@ -21,6 +23,7 @@ public class Node3D : MonoBehaviour
     {
         m_nodeIndex = nodeIndex;
         this.neighbours = new List<Transform>();
+        idText.text = nodeIndex.ToString();
     }
 
     void OnEnable()
