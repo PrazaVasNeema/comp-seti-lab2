@@ -10,9 +10,38 @@ public class HexagonGridGenerator : MonoBehaviour
     private int verticesPerHexagon = 6;
     private int sharedVertices = 2;
 
-    void Start()
+    // void Start()
+    // {
+    //     var (adjMatrix, positions) = GenerateHexagonRowAdjacencyMatrix(numHexagons);
+    //     PrintAdjacencyMatrix(adjMatrix);
+    //     PrintPositions(positions);
+    //
+    //     test2.HexGrid.SaveAdjacencyMatrixToFile(adjMatrix, Application.dataPath + "/TESTTESTTESTadjacency_matrix.txt");
+    //
+    //     var NodeGraphFormDataList = new List<Form3DGraph.NodeGraphData>();
+    //     
+    //     for (int i = 0; i < positions.Count; i++)
+    //     {
+    //         var node = new Form3DGraph.NodeGraphData();
+    //         node.Coords = positions[i];
+    //         node.Neighbours = new List<int>();
+    //         for (int j = 0; j < positions.Count; j++)
+    //         {
+    //             if (adjMatrix[i, j] == 1)
+    //             {
+    //                 node.Neighbours.Add(j);
+    //             }
+    //         }
+    //         NodeGraphFormDataList.Add(node);
+    //     }
+    //     
+    //     GameEvents.OnVisualizeGraph?.Invoke(NodeGraphFormDataList);
+    // }
+
+    public int[,] CREATE(int numHexagons, out int COUNT)
     {
         var (adjMatrix, positions) = GenerateHexagonRowAdjacencyMatrix(numHexagons);
+        
         PrintAdjacencyMatrix(adjMatrix);
         PrintPositions(positions);
 
@@ -36,7 +65,13 @@ public class HexagonGridGenerator : MonoBehaviour
         }
         
         GameEvents.OnVisualizeGraph?.Invoke(NodeGraphFormDataList);
+
+
+        COUNT = positions.Count;
+        
+        return adjMatrix;
     }
+
 
     private (int[,], List<Vector2>) GenerateHexagonRowAdjacencyMatrix(int numHexagons)
     {

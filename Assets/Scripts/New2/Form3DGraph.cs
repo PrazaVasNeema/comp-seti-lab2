@@ -17,6 +17,8 @@ public class Form3DGraph : MonoBehaviour
     
     [SerializeField] private Node3D pointPrefab;
     [SerializeField] private float multiplier = 5f;
+
+    [SerializeField] private GameObject nodesParent;
     
 
     private void OnEnable()
@@ -29,8 +31,17 @@ public class Form3DGraph : MonoBehaviour
         GameEvents.OnVisualizeGraph -= VisualizeGraph;
     }
 
+    private void Clear()
+    {
+        foreach (var child in nodesParent.transform.GetComponentsInChildren<Transform>())
+        {
+            Destroy(child.gameObject);
+        }
+    }
+
     private void VisualizeGraph(List<NodeGraphData> nodeDataList)
     {
+        Clear();
         List<Node3D> nodes = new List<Node3D>();
         
         for (int i = 0; i < nodeDataList.Count; i ++)

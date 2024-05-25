@@ -96,15 +96,22 @@ public class UIController : MonoBehaviour
         m_redAux.SetActive(false);
     }
 
-
+    [SerializeField] private GameObject m_ui3D;
     [SerializeField] private GameObject m_canvas;
     [SerializeField] private ViewOverseer m_ViewOverseer;
     
     public void Set3DView()
     {
+        m_ui3D.SetActive(true);
         m_canvas.SetActive(false);
     }
-    
+
+    public void SetCanvasView()
+    {
+        m_ui3D.SetActive(false);
+        m_canvas.SetActive(true);
+
+    }
     
 
     public void SetCanvasView(int index)

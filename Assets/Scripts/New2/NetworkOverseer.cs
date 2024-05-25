@@ -118,10 +118,17 @@ public class NetworkOverseer : MonoBehaviour
         DoEmulation();
     }
 
+    private int[,] theMATRIX;
+    private int COUNTT;
+    
     private void InitializeEmulation()
     {
+        theMATRIX = m_hexagonGridGenerator.CREATE(labData.nodesCount, out int COUNT);
+
+        COUNTT = COUNT;
+        
         serverNodes = new List<ServerNode>();
-        for (int i = 0; i < labData.nodesCount; i++)
+        for (int i = 0; i < COUNT; i++)
         {
             var newServerNode = new ServerNode();
             serverNodes.Add(newServerNode);
@@ -136,39 +143,61 @@ public class NetworkOverseer : MonoBehaviour
         
     }
     
+    [SerializeField] private HexagonGridGenerator m_hexagonGridGenerator;
+    
     private void CreateGraphAndFillNeighbours()
     {
         
         if (serverNodes.Count == 1)
             return;
-        var neighboursList = new List<ServerNode>();
-        neighboursList.Add(serverNodes[1]);
-        serverNodes[0].FillServerNeighbours(neighboursList);
+
         
         var neighbourIdList = new List<List<int>>();
-        neighbourIdList.Add(new List<int>());
-        neighbourIdList[0].Add(1);
         
-        for (int i = 1; i < serverNodes.Count - 1; i++)
+        for (int i = 0; i < COUNTT; i++)
         {
-            neighboursList = new List<ServerNode>();
-            neighboursList.Add(serverNodes[i - 1]);
-            neighboursList.Add(serverNodes[i + 1]);
-            serverNodes[i].FillServerNeighbours(neighboursList);
-            
+            var neighboursList = new List<ServerNode>();
             neighbourIdList.Add(new List<int>());
-            neighbourIdList[i].Add(i-1);
-            neighbourIdList[i].Add(i+1);
+
+            for (int j = 0; j < COUNTT; j++)
+            {
+                if (theMATRIX[i, j] == 1)
+                {
+                    neighboursList.Add(serverNodes[j]);
+                    neighbourIdList[i].Add(j);
+                }
+            }
+            serverNodes[i].FillServerNeighbours(neighboursList);
         }
         
-        // ??
-        
-        neighboursList = new List<ServerNode>();
-        neighboursList.Add(serverNodes[^2]);
-        serverNodes[^1].FillServerNeighbours(neighboursList);
-        
-        neighbourIdList.Add(new List<int>());
-        neighbourIdList[^1].Add(serverNodes.Count - 1);
+        // var neighboursList = new List<ServerNode>();
+        // neighboursList.Add(serverNodes[1]);
+        // serverNodes[0].FillServerNeighbours(neighboursList);
+        //
+        // var neighbourIdList = new List<List<int>>();
+        // neighbourIdList.Add(new List<int>());
+        // neighbourIdList[0].Add(1);
+        //
+        // for (int i = 1; i < serverNodes.Count - 1; i++)
+        // {
+        //     neighboursList = new List<ServerNode>();
+        //     neighboursList.Add(serverNodes[i - 1]);
+        //     neighboursList.Add(serverNodes[i + 1]);
+        //     serverNodes[i].FillServerNeighbours(neighboursList);
+        //     
+        //     neighbourIdList.Add(new List<int>());
+        //     neighbourIdList[i].Add(i-1);
+        //     neighbourIdList[i].Add(i+1);
+        // }
+        //
+        // // ??
+        //
+        // neighboursList = new List<ServerNode>();
+        // neighboursList.Add(serverNodes[^2]);
+        // serverNodes[^1].FillServerNeighbours(neighboursList);
+        //
+        // neighbourIdList.Add(new List<int>());
+        // neighbourIdList[^1].Add(serverNodes.Count - 1);
         
         GameEvents.OnInitNodes?.Invoke(neighbourIdList);
     }
