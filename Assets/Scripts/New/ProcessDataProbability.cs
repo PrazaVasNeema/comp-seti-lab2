@@ -69,8 +69,8 @@ public class ProcessDataProbability
                     // Debug.Log((int) (Mathf.Lerp(0, 99.9f,value / maxValue)));
                 }
                 
-                if (value == maxValue)
-                    Debug.Log($"value: {value}");
+                // if (value == maxValue)
+                //     Debug.Log($"value: {value}");
 
                 densityDict[(int) (Mathf.Lerp(0, 99.9f,value / maxValue))]++;
                 valueCounter++;

@@ -64,7 +64,7 @@ public class ProcessDataProbabilityPprostoi
 
         Pprostoi /= serverLogList.Count;
 
-        result = "SERVER NODE ID: " + NodeId +"lambda: " + lab1Data.lambda + ", " + "D: " + lab1Data.D + ", " + "mean: " + lab1Data.mean + ", " + "std_dev: " + lab1Data.std_dev + ", " + "Pprostoi: " + Pprostoi;
+        result = "(P) SERVER NODE ID: " + NodeId +", lambda: " + lab1Data.lambda + ", " + "D: " + lab1Data.D + ", " + "mean: " + lab1Data.mean + ", " + "std_dev: " + lab1Data.std_dev + ", " + "Pprostoi: " + Pprostoi;
         
         Debug.Log($"Result: {result}");
 

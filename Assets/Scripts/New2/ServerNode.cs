@@ -51,7 +51,7 @@ public class ServerNode
             str += VARIABLE.thisID + " ";
         }
         
-        Debug.Log($"This is {thisID}, My neighbours are: {str}");
+        // Debug.Log($"This is {thisID}, My neighbours are: {str}");
     }
 
     public void ClearServerData()
