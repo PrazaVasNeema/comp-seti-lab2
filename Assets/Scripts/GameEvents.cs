@@ -20,5 +20,8 @@ public class GameEvents : MonoBehaviour
 
     public static System.Action OnClearAllAuxParams;
 
+    public static System.Action<List<Form3DGraph.NodeGraphData>> OnVisualizeGraph;
+    public static System.Action <int> OnClickOnNode;
+
 
 }

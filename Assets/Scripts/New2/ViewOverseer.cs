@@ -91,12 +91,20 @@ public class ViewOverseer : MonoBehaviour
     [SerializeField] private TMP_Text m_neighboursText;
     private int m_currentNodeIndex = -1;
 
-    public void OnUpdateNodeData()
+    
+    
+    
+    public void OnUpdateNodeDataViaDropdown()
     {
         if (m_nodesDropdown.value == 0)
             return;
 
-        m_currentNodeIndex = m_nodesDropdown.value - 1;
+        OnUpdateNodeDataCoreLogic(m_nodesDropdown.value - 1);
+    }
+    
+    public void OnUpdateNodeDataCoreLogic(int index)
+    {
+        m_currentNodeIndex = index;
         
         string neighboursFinalText = "";
         foreach (var neighbourId in m_nodesNeighboursList[m_currentNodeIndex])
@@ -124,8 +132,6 @@ public class ViewOverseer : MonoBehaviour
             }
         }
     }
-    
-    
     
     
     // Start is called before the first frame update

@@ -29,11 +29,13 @@ public class UIController : MonoBehaviour
     public void OnEnable()
     {
         GameEvents.OnChangeUIStateAux += ChangeUIStateAux;
+        GameEvents.OnClickOnNode += SetCanvasView;
     }
     
     public void OnDisable()
     {
         GameEvents.OnChangeUIStateAux -= ChangeUIStateAux;
+        GameEvents.OnClickOnNode -= SetCanvasView;
     }
 
     private void ChangeUIStateAux(UIStateAux uiStateAux)
@@ -92,6 +94,24 @@ public class UIController : MonoBehaviour
         m_greenAux.SetActive(false);
         m_greyAux.SetActive(true);
         m_redAux.SetActive(false);
+    }
+
+
+    [SerializeField] private GameObject m_canvas;
+    [SerializeField] private ViewOverseer m_ViewOverseer;
+    
+    public void Set3DView()
+    {
+        m_canvas.SetActive(false);
+    }
+    
+    
+
+    public void SetCanvasView(int index)
+    {
+        m_canvas.SetActive(true);
+        
+        m_ViewOverseer.OnUpdateNodeDataCoreLogic(index);
     }
     
 }
