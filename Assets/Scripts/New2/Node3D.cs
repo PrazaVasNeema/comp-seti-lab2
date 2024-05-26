@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -17,13 +18,46 @@ public class Node3D : MonoBehaviour
     private Renderer objectRenderer;
     private int m_nodeIndex;
     [FormerlySerializedAs("m_neighbours")] public List<Transform> neighbours = new List<Transform>();
+    
+    
+    private List<LineRenderer> lineRendererList;
+    [SerializeField] private float lineWidth = 0.1f;
 
 
     public void LoadData(int nodeIndex)
     {
+
+        
         m_nodeIndex = nodeIndex;
         this.neighbours = new List<Transform>();
         idText.text = nodeIndex.ToString();
+
+    }
+
+    public void SetupLineRenderers()
+    {
+        lineRendererList = new List<LineRenderer>();
+        for (int i = 0; i < neighbours.Count; i++)
+        {
+            var newLineRenderer = new GameObject("LineRenderer").AddComponent<LineRenderer>();
+            newLineRenderer.transform.parent = transform;
+            lineRendererList.Add(newLineRenderer);
+            // lineRendererList[i] = GetComponent<LineRenderer>();
+            lineRendererList[i].startWidth = lineWidth;
+            lineRendererList[i].endWidth = lineWidth;
+            lineRendererList[i].material = new Material(Shader.Find("Sprites/Default"));
+            lineRendererList[i].startColor = lineColor;
+            lineRendererList[i].endColor = lineColor;
+        }
+    }
+    
+    private void Update()
+    {
+        for (int i = 0; i < neighbours.Count; i++)
+        {
+            lineRendererList[i].SetPosition(0, transform.position);
+            lineRendererList[i].SetPosition(1, neighbours[i].position);
+        }
     }
 
     void OnEnable()

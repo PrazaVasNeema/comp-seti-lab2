@@ -66,6 +66,8 @@ public class Form3DGraph : MonoBehaviour
             }
             
             nodes[i].neighbours = neighbours;
+            
+            nodes[i].SetupLineRenderers();
         }
     }
 
