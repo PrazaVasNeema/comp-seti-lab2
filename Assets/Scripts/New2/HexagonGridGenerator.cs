@@ -161,66 +161,6 @@ public class HexagonGridGenerator : MonoBehaviour
             }
         }
 
-        // // Handle the remaining vertices if they form a "broken" hexagon
-        // if (remainingVertices > 0)
-        // {
-        //     float base_x = NumFullHexagons * 1.5f;
-        //     float base_y = (NumFullHexagons % 2 == 0) ? 0 : Mathf.Sqrt(3) / 2;
-        //
-        //     Vector2[] pos = new Vector2[]
-        //     {
-        //         new Vector2(base_x, base_y),
-        //         new Vector2(base_x + 0.5f, base_y + Mathf.Sqrt(3) / 2),
-        //         new Vector2(base_x + 1.5f, base_y + Mathf.Sqrt(3) / 2),
-        //         new Vector2(base_x + 2.0f, base_y),
-        //         new Vector2(base_x + 1.5f, base_y - Mathf.Sqrt(3) / 2),
-        //         new Vector2(base_x + 0.5f, base_y - Mathf.Sqrt(3) / 2)
-        //     };
-        //
-        //     for (int i = 0; i < remainingVertices; i++)
-        //     {
-        //         if (!vertexIndex.ContainsKey(pos[i]))
-        //         {
-        //             vertexIndex[pos[i]] = currentVertex;
-        //             positions.Add(pos[i]);
-        //             currentVertex++;
-        //         }
-        //     }
-        //
-        //     if (remainingVertices == 1)
-        //     {
-        //         int v1 = vertexIndex[pos[0]];
-        //         int v2 = vertexIndex[pos[1]];
-        //         adjMatrix[v1, v2] = 1;
-        //         adjMatrix[v2, v1] = 1;
-        //     }
-        //     else if (remainingVertices == 2)
-        //     {
-        //         int v1 = vertexIndex[pos[0]];
-        //         int v2 = vertexIndex[pos[1]];
-        //         int v3 = vertexIndex[pos[2]];
-        //         adjMatrix[v1, v2] = 1;
-        //         adjMatrix[v2, v1] = 1;
-        //         adjMatrix[v2, v3] = 1;
-        //         adjMatrix[v3, v2] = 1;
-        //     }
-        //     else
-        //     {
-        //         for (int i = 0; i < remainingVertices - 1; i++)
-        //         {
-        //             int v1 = vertexIndex[pos[i]];
-        //             int v2 = vertexIndex[pos[i + 1]];
-        //             adjMatrix[v1, v2] = 1;
-        //             adjMatrix[v2, v1] = 1;
-        //         }
-        //
-        //         int vLast = vertexIndex[pos[remainingVertices - 1]];
-        //         int vFirst = vertexIndex[pos[0]];
-        //         adjMatrix[vLast, vFirst] = 1;
-        //         adjMatrix[vFirst, vLast] = 1;
-        //     }
-        // }
-
         return (adjMatrix, positions);
     }
 

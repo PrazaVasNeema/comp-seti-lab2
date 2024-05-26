@@ -94,18 +94,18 @@ public class ServerNode
                 var eventData2 = new NetworkOverseer.EventData(this, NDT.ServerLog.EventType.T2, overseer.serverTime + Bx);
                 overseer.AddEvent(eventData2);
                 curProcessedTask = newTask;
+                thisServerLog.allTimeIncomeTasksCount++;
+
             }
             else if(qBuffer.bufferCount < m_qMaxSize)
             {
                 AddTaskToBuffer(newTask);
-                // qBuffer.AddTask(newTask);
             }
             
             TIP = NDT.ServerLog.EventType.T1;
         }
         else
         {
-            // Debug.Log($"curProcessedTask = {curProcessedTask}");
             serverLog.SetTaskFinishTime(curProcessedTask, overseer.serverTime);
             
             DecideTaskDestiny(curProcessedTask);
@@ -127,7 +127,6 @@ public class ServerNode
             overseer.IncreaseProcessedTaskCount();
             
             TIP = NDT.ServerLog.EventType.T2;
-            // compTasksCount++;
         }
         
         var curServerGeneralLog = new NDT.ServerLog.ServerStatus();
@@ -163,22 +162,7 @@ public class ServerNode
 
         return true;
     }
-
-    // private NDT.ServerLog DoT1()
-    // {
-    //     
-    //     var serverLog = new NDT.ServerLog();
-    //     return serverLog;
-    //     
-    // }
-    //
-    // private NDT.ServerLog DoT2()
-    // {
-    //     
-    //     var serverLog = new NDT.ServerLog();
-    //     return serverLog;
-    //     
-    // }
+    
 
     public NetworkOverseer.EventData GenerateEvent(NDT.ServerLog.EventType eventType)
     {
@@ -261,6 +245,7 @@ public class ServerNode
 
         if (minProcessTimeNode != null)
         {
+            // Debug.Log("Works fine! " + thisID);
             minProcessTimeNode.AddTaskToBuffer(task);
         }
     }

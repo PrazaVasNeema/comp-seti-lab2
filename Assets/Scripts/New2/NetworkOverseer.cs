@@ -64,7 +64,6 @@ public class NetworkOverseer : MonoBehaviour
         processedTaskCount++;
     }
     
-    // A method to add an event to the eventQueue for a certain serverNode with a certain eventType and the lowest value
     public void AddEvent(EventData eventData)
     {
 
@@ -170,34 +169,6 @@ public class NetworkOverseer : MonoBehaviour
             serverNodes[i].FillServerNeighbours(neighboursList);
         }
         
-        // var neighboursList = new List<ServerNode>();
-        // neighboursList.Add(serverNodes[1]);
-        // serverNodes[0].FillServerNeighbours(neighboursList);
-        //
-        // var neighbourIdList = new List<List<int>>();
-        // neighbourIdList.Add(new List<int>());
-        // neighbourIdList[0].Add(1);
-        //
-        // for (int i = 1; i < serverNodes.Count - 1; i++)
-        // {
-        //     neighboursList = new List<ServerNode>();
-        //     neighboursList.Add(serverNodes[i - 1]);
-        //     neighboursList.Add(serverNodes[i + 1]);
-        //     serverNodes[i].FillServerNeighbours(neighboursList);
-        //     
-        //     neighbourIdList.Add(new List<int>());
-        //     neighbourIdList[i].Add(i-1);
-        //     neighbourIdList[i].Add(i+1);
-        // }
-        //
-        // // ??
-        //
-        // neighboursList = new List<ServerNode>();
-        // neighboursList.Add(serverNodes[^2]);
-        // serverNodes[^1].FillServerNeighbours(neighboursList);
-        //
-        // neighbourIdList.Add(new List<int>());
-        // neighbourIdList[^1].Add(serverNodes.Count - 1);
         
         GameEvents.OnInitNodes?.Invoke(neighbourIdList);
     }
@@ -252,13 +223,8 @@ public class NetworkOverseer : MonoBehaviour
 
                     if (!isGood)
                     {
-                        // m_progressBarGO.SetActive(false);
                         return null;
                     }
-
-                    // m_progressBarFillRate = Mathf.Lerp(0f, 0.5f, (float)j / m_labData.iterAmount);
-                    
-                    // Debug.Log($"processedTaskCount = {processedTaskCount}");
 
                     if (cancelTokenSource.IsCancellationRequested)
                         return null;
@@ -325,21 +291,11 @@ public class NetworkOverseer : MonoBehaviour
             return nodeViewDataList;
         });
             
-
         
-        // !!
-        
-        // foreach (var theData in theDataResult)
-        // {
-        //     GameEvents.OnBuildView?.Invoke(theData);
-        // }
         
         GameEvents.OnLoadDataViewOverseer?.Invoke(theDataResult);
-        
         GameEvents.OnChangeAuxParamsView?.Invoke(++DataView.curParamsValuesCount, labData);
-        
         GameEvents.OnAddResultAuxParamsDataList?.Invoke(ResultParamsList);
-        
         GameEvents.OnChangeUIStateAux?.Invoke(UIController.UIStateAux.Green);
         
     }

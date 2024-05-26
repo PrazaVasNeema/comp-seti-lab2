@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -184,5 +185,19 @@ public class ViewOverseer : MonoBehaviour
     private void OnLoadResultParamsData(List<Vector2> obj)
     {
         m_resultParamsDataListList.Add(obj);
+        SaveParamsValues(obj, Application.dataPath + "/params.txt");
+    }
+    
+    public void SaveParamsValues(List<Vector2> obj, string filePath)
+    {
+        using (StreamWriter writer = new StreamWriter(filePath))
+        {
+            writer.WriteLine("case: " + m_resultParamsDataListList.Count);
+            foreach (var vector2 in obj)
+            {
+                writer.WriteLine(ResultAuxParamsValues.GetFirstNDigitsIncludingDecimal(vector2.x, 4) + " " + ResultAuxParamsValues.GetFirstNDigitsIncludingDecimal(vector2.y, 4));
+            }
+           
+        }
     }
 }
