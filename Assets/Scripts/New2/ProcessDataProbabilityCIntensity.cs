@@ -27,7 +27,7 @@ public class ProcessDataProbabilityCIntensity
         }
     }
 
-    public void GetViewData(List<NDT.ServerLog> serverLogList, Lab1DataSO.Data lab1Data, int NodeId, float TotalNetworkTime)
+    public float GetViewData(List<NDT.ServerLog> serverLogList, Lab1DataSO.Data lab1Data, int NodeId, float TotalNetworkTime)
     {
         
         
@@ -49,7 +49,7 @@ public class ProcessDataProbabilityCIntensity
         
         Debug.Log($"Result: {result}");
 
-
+        return resultValue;
     }
 
 

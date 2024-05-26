@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+
 public class ViewOverseer : MonoBehaviour
 {
 
@@ -17,16 +18,20 @@ public class ViewOverseer : MonoBehaviour
     private List<List<int>> m_nodesNeighboursList = new List<List<int>>();
     private List<List<NodeViewData>> m_nodeViewDataList = new List<List<NodeViewData>>();
     
+    private List<List<Vector2>> m_resultParamsDataListList = new List<List<Vector2>>();
+    
     private void OnEnable()
     {
         GameEvents.OnLoadDataViewOverseer += OnLoadDataViewOverseer;
         GameEvents.OnInitNodes += OnInitNodes;
+        GameEvents.OnAddResultAuxParamsDataList += OnLoadResultParamsData;
     }
 
     private void OnDisable()
     {
         GameEvents.OnLoadDataViewOverseer -= OnLoadDataViewOverseer;
         GameEvents.OnInitNodes -= OnInitNodes;
+        GameEvents.OnAddResultAuxParamsDataList -= OnLoadResultParamsData;
     }
     
     private void OnInitNodes(List<List<int>> obj)
@@ -66,6 +71,11 @@ public class ViewOverseer : MonoBehaviour
         GameEvents.OnClearAllAuxParams?.Invoke();
         
         m_nodeViewDataList = new List<List<NodeViewData>>();
+        m_resultParamsDataListList = new List<List<Vector2>>();
+
+        GameEvents.OnClearResultAuxParamsView?.Invoke();
+
+
     }
     
     // Buttons
@@ -84,6 +94,8 @@ public class ViewOverseer : MonoBehaviour
         m_currentNodeIndex = -1;
         m_nodesNeighboursList = new List<List<int>>();
 
+        GameEvents.OnClearResultAuxParamsView?.Invoke();
+        
     }
     
     // ----
@@ -120,6 +132,7 @@ public class ViewOverseer : MonoBehaviour
 
         
         GameEvents.OnClearViewData?.Invoke();
+        GameEvents.OnClearResultAuxParamsView?.Invoke();
         foreach (var nodeViewDataListIter in m_nodeViewDataList)
         {
             if (nodeViewDataListIter.Count <= m_currentNodeIndex)
@@ -136,6 +149,20 @@ public class ViewOverseer : MonoBehaviour
                 GameEvents.OnBuildView?.Invoke(viewData);
             }
         }
+
+        int i = -1;
+        
+        foreach (var paramsList in m_resultParamsDataListList)
+        {
+            i++;
+            if (paramsList.Count <= m_currentNodeIndex)
+            {
+                GameEvents.OnChangeResultAuxParamsView?.Invoke(i, new UnityEngine.Vector2(-1, -1));
+                continue;
+            }
+            
+            GameEvents.OnChangeResultAuxParamsView?.Invoke(i, paramsList[m_currentNodeIndex]);
+        }
     }
     
     
@@ -149,5 +176,13 @@ public class ViewOverseer : MonoBehaviour
     void Update()
     {
         
+    }
+    
+    
+    // ---
+
+    private void OnLoadResultParamsData(List<Vector2> obj)
+    {
+        m_resultParamsDataListList.Add(obj);
     }
 }

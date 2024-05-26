@@ -292,6 +292,7 @@ public class NetworkOverseer : MonoBehaviour
 
 
 
+        List<Vector2> ResultParamsList = new List<Vector2>();
         
         
         var theDataResult = await Task.Run(() =>
@@ -310,10 +311,13 @@ public class NetworkOverseer : MonoBehaviour
                 nodeViewDataList[i].viewDataList.Add(processDataProbabilityGauss.GetViewData(resultServerLogListDict[i]));
                 nodeViewDataList[i].viewDataList.Add(processDataProbabilityErland5D.GetViewData(resultServerLogListDict[i]));
                 nodeViewDataList[i].viewDataList.Add(processDataProbabilityUx.GetViewData(resultServerLogListDict[i]));
-                processDataProbabilityPprostoi.GetViewData(resultServerLogListDict[i], labData, serverNodes[i].thisID);
-                processDataProbabilityCIntensity.GetViewData(resultServerLogListDict[i], labData, serverNodes[i].thisID, serverTime);
+                
+                var x = processDataProbabilityPprostoi.GetViewData(resultServerLogListDict[i], labData, serverNodes[i].thisID);
+                var y = processDataProbabilityCIntensity.GetViewData(resultServerLogListDict[i], labData, serverNodes[i].thisID, serverTime);
 
-
+                var resultParamsVector2 = new Vector2(x, y);
+                ResultParamsList.Add(resultParamsVector2);
+                
                 m_progressBarFillRate += iterStep;
             }
             
@@ -333,6 +337,8 @@ public class NetworkOverseer : MonoBehaviour
         GameEvents.OnLoadDataViewOverseer?.Invoke(theDataResult);
         
         GameEvents.OnChangeAuxParamsView?.Invoke(++DataView.curParamsValuesCount, labData);
+        
+        GameEvents.OnAddResultAuxParamsDataList?.Invoke(ResultParamsList);
         
         GameEvents.OnChangeUIStateAux?.Invoke(UIController.UIStateAux.Green);
         
