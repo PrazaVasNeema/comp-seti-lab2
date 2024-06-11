@@ -14,6 +14,8 @@ public class Form3DGraph : MonoBehaviour
     }
     
 
+
+
     
     [SerializeField] private Node3D pointPrefab;
     [SerializeField] private float multiplier = 5f;
@@ -23,6 +25,7 @@ public class Form3DGraph : MonoBehaviour
 
     private void OnEnable()
     {
+        Debug.Log("TEST");
         GameEvents.OnVisualizeGraph += VisualizeGraph;
     }
 

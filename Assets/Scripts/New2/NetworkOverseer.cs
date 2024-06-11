@@ -13,6 +13,8 @@ public class NetworkOverseer : MonoBehaviour
     private void OnEnable()
     {
         Instance = this;
+        Debug.Log("TEST");
+
     }
 
     public class EventData
@@ -53,7 +55,7 @@ public class NetworkOverseer : MonoBehaviour
         {
             m_progressBar.fillAmount = m_progressBarFillRate;
         }
-    }
+    } 
     
     public void IncreaseTotalTaskCount()
     {
