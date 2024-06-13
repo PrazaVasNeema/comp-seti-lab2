@@ -90,6 +90,7 @@ namespace lab3
 
             m_visualizations.DrawParabola();
             m_visualizations.VisualizePoints(pointDataList);
+            m_visualizations.VisualizeEdges(pointDataList, ref adjacencyMatrix);
         }
 
         private void OnDestroy()

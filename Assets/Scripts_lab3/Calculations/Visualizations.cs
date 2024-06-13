@@ -17,6 +17,11 @@ namespace lab3
         private List<GameObject> pointObjects = new List<GameObject>(); // Список созданных объектов точек
         private List<LineRenderer> radiusRenderers = new List<LineRenderer>(); // Список LineRenderer для визуализации радиусов
 
+        [SerializeField] private GameObject arrowPrefab;
+        private List<GameObject> arrowObjects = new List<GameObject>();
+
+        private List<LineRenderer> arrowRenderers = new List<LineRenderer>(); // Список LineRenderer для визуализации радиусов
+
 
         void Start()
         {
@@ -39,8 +44,21 @@ namespace lab3
             {
                 Destroy(obj.transform.gameObject);
             }
+
+            foreach (GameObject obj in arrowObjects)
+            {
+                Destroy(obj);
+            }
+
+            foreach (LineRenderer obj in arrowRenderers)
+            {
+                Destroy(obj.transform.gameObject);
+            }
+
             pointObjects = new List<GameObject>();
             radiusRenderers = new List<LineRenderer>();
+            arrowObjects = new List<GameObject>();
+            arrowRenderers = new List<LineRenderer>();
         }    
 
         public void DrawParabola()
@@ -91,6 +109,41 @@ namespace lab3
             }
         }
 
+
+        public void VisualizeEdges(List<NDT.PointData> points, ref int[,] adjacencyMatrix)
+        {
+            for (int i = 0; i < points.Count; i++)
+            {
+                for (int j = 0; j < points.Count; j++)
+                {
+                    if (adjacencyMatrix[i, j] == 1)
+                    {
+                        Vector3 start = new Vector3(points[i].position.x, points[i].position.y, 0);
+                        Vector3 end = new Vector3(points[j].position.x, points[j].position.y, 0);
+
+                        // Создаем LineRenderer для ребра
+                        GameObject edgeObject = new GameObject("Edge");
+                        LineRenderer edgeRenderer = edgeObject.AddComponent<LineRenderer>();
+                        edgeRenderer.positionCount = 2;
+                        edgeRenderer.widthMultiplier = 0.05f;
+                        edgeRenderer.material = new Material(Shader.Find("Sprites/Default"));
+                        edgeRenderer.startColor = Color.green;
+                        edgeRenderer.endColor = Color.green;
+                        edgeRenderer.SetPositions(new Vector3[] { start, end });
+                        arrowRenderers.Add(edgeRenderer);
+
+                        // Создаем стрелку
+                        GameObject arrowObject = Instantiate(arrowPrefab, end, Quaternion.identity);
+                        Vector3 direction = (end - start).normalized;
+                        arrowObject.transform.position = end - direction * .5f; // Смещение стрелки немного назад
+                        //arrowObject.transform.rotation = Quaternion.LookRotation(arrowObject.transform.forward, direction);
+                        arrowObject.transform.LookAt(end);
+                        arrowObjects.Add(arrowObject);
+                    }
+                }
+            }
+        }
+
         public void UpdatePointSizes(float zoom)
         {
             float scaleFactor = basePointSize * zoom / 25;
@@ -103,6 +156,18 @@ namespace lab3
             {
                 // Изменяем ширину LineRenderer при изменении зума
                 radiusRenderer.widthMultiplier = 0.05f * zoom / 25;
+            }
+
+
+            foreach (var arrowObject in arrowObjects)
+            {
+                arrowObject.transform.localScale = Vector3.one * scaleFactor * 20;
+            }
+
+            foreach (var arrowRenderer in arrowRenderers)
+            {
+                // Изменяем ширину LineRenderer при изменении зума
+                arrowRenderer.widthMultiplier = 0.05f * zoom / 20;
             }
         }
     }

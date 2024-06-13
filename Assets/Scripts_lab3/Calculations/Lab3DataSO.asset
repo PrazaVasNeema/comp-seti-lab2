@@ -18,8 +18,8 @@ MonoBehaviour:
     meanY: 50
     stdDevY: 20
     r_min: 0.5
-    r_max: 10
-    n_start: 0
-    n_end: 100
-    n_stepCount: 100
+    r_max: 20
+    n_start: 1
+    n_end: 10
+    n_stepCount: 1
     iterAmount: 100
