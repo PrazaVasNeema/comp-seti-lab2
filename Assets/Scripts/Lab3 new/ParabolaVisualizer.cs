@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
 
 public class ParabolaAndPointsVisualizer : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class ParabolaAndPointsVisualizer : MonoBehaviour
     public float basePointSize = 1f; // Базовый размер точки
     public float minRadius = 0.5f; // Минимальное значение радиуса
     public float maxRadius = 2.0f; // Максимальное значение радиуса
+    public float neighborRadius = 5.0f; // Радиус для определения соседей
 
     public int numberOfPoints = 100; // Количество точек
     public float meanX = 0f;
@@ -21,6 +23,7 @@ public class ParabolaAndPointsVisualizer : MonoBehaviour
 
     private List<GameObject> pointObjects = new List<GameObject>(); // Список созданных объектов точек
     private List<LineRenderer> radiusRenderers = new List<LineRenderer>(); // Список LineRenderer для визуализации радиусов
+    private List<PointData> points; // Список данных точек
 
     void Start()
     {
@@ -33,6 +36,7 @@ public class ParabolaAndPointsVisualizer : MonoBehaviour
 
         DrawParabola();
         VisualizePoints();
+        CreateAdjacencyMatrix();
     }
 
     void DrawParabola()
@@ -52,7 +56,7 @@ public class ParabolaAndPointsVisualizer : MonoBehaviour
 
     void VisualizePoints()
     {
-        List<PointData> points = GeneratePointsBelowParabola(numberOfPoints, meanX, stdDevX, meanY, stdDevY, minRadius, maxRadius);
+        points = GeneratePointsBelowParabola(numberOfPoints, meanX, stdDevX, meanY, stdDevY, minRadius, maxRadius);
         foreach (var point in points)
         {
             GameObject pointObject = Instantiate(pointPrefab, new Vector3(point.position.x, point.position.y, 0), Quaternion.identity);
@@ -95,7 +99,7 @@ public class ParabolaAndPointsVisualizer : MonoBehaviour
         foreach (var radiusRenderer in radiusRenderers)
         {
             // Изменяем ширину LineRenderer при изменении зума
-            radiusRenderer.widthMultiplier = 0.1f * zoom / 25;
+            radiusRenderer.widthMultiplier = 0.05f * zoom / 25;
         }
     }
 
@@ -126,6 +130,68 @@ public class ParabolaAndPointsVisualizer : MonoBehaviour
         double u2 = 1.0 - rand.NextDouble();
         double randStdNormal = Mathf.Sqrt(-2.0f * Mathf.Log((float)u1)) * Mathf.Sin(2.0f * Mathf.PI * (float)u2); // Random normal(0,1)
         return mean + stdDev * (float)randStdNormal; // Random normal(mean,stdDev^2)
+    }
+
+    void CreateAdjacencyMatrix()
+    {
+        int n = points.Count;
+        int[,] adjacencyMatrix = new int[n, n];
+
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < n; j++)
+            {
+                if (i != j && Vector2.Distance(points[i].position, points[j].position) <= points[i].radius)
+                {
+                    adjacencyMatrix[i, j] = 1;
+                }
+                else
+                {
+                    adjacencyMatrix[i, j] = 0;
+                }
+            }
+        }
+
+        WriteMatrixToFile(adjacencyMatrix, "AdjacencyMatrix.txt");
+
+        // Вычисление математического ожидания полустепени вершины по выходу
+        float averageOutDegree = CalculateAverageOutDegree(adjacencyMatrix);
+        Debug.Log($"Average out-degree: {averageOutDegree}");
+    }
+
+    float CalculateAverageOutDegree(int[,] matrix)
+    {
+        int n = matrix.GetLength(0);
+        int totalOutDegree = 0;
+
+        for (int i = 0; i < n; i++)
+        {
+            int outDegree = 0;
+            for (int j = 0; j < n; j++)
+            {
+                outDegree += matrix[i, j];
+            }
+            totalOutDegree += outDegree;
+        }
+
+        return (float)totalOutDegree / n;
+    }
+
+    void WriteMatrixToFile(int[,] matrix, string fileName)
+    {
+        int n = matrix.GetLength(0);
+        using (StreamWriter writer = new StreamWriter(fileName))
+        {
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    writer.Write(matrix[i, j]);
+                    if (j < n - 1) writer.Write(" ");
+                }
+                writer.WriteLine();
+            }
+        }
     }
 }
 
