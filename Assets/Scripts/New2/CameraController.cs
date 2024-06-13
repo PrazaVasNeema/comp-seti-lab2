@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
@@ -6,8 +6,9 @@ public class CameraController : MonoBehaviour
     public float zoomSpeed = 2;
     public float minZoom = 5;
     public float maxZoom = 20;
-    
+
     [SerializeField] private Camera m_camera;
+    public ParabolaAndPointsVisualizer visualizer; // Ссылка на визуализатор
 
     private Vector3 dragOrigin;
 
@@ -43,6 +44,7 @@ public class CameraController : MonoBehaviour
         {
             float newZoom = Mathf.Clamp(m_camera.orthographicSize - scroll * zoomSpeed, minZoom, maxZoom);
             m_camera.orthographicSize = newZoom;
+            visualizer.UpdatePointSizes(newZoom); // Обновить размеры точек
         }
     }
 }
