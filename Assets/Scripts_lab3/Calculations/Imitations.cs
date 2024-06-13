@@ -32,11 +32,13 @@ namespace lab3
             float[] mathExpArray = new float[m_data.iterAmount];
             float[] MainCompVertCountArray = new float[m_data.iterAmount];
             float mathExpSum;
+            float mainCompSum;
 
             // Iter usage
             List<NDT.PointData> pointDataList = new List<NDT.PointData>();
 
-            int step = (int)((m_data.n_end - m_data.n_start) / m_data.n_stepCount);
+            int step = (int)((m_data.n_end - m_data.n_start) / m_data.n_stepCount) > 0 ? (int)((m_data.n_end - m_data.n_start) / m_data.n_stepCount) : 1;
+            //Debug.Log("Step:" + step);
 
             GameEvents.OnChangeUIStateAux?.Invoke(UIController.UIStateAux.Grey);
 
@@ -56,6 +58,7 @@ namespace lab3
                 {
                     int[,] adjacencyMatrix = new int[curN, curN];
                     mathExpSum = 0f;
+                    mainCompSum = 0f;
 
                     for (int iter = 0; iter < m_data.iterAmount; iter++)
                     {
@@ -67,12 +70,17 @@ namespace lab3
 
                         var test = m_analyzations.CalculateAverageOutDegree(ref adjacencyMatrix);
                         mathExpSum += test;
+
+                        var test2 = m_analyzations.CalculateMainComponentSize(ref adjacencyMatrix);
+                        mainCompSum += test2;
                     }
 
                     viewDatas[0].pointsList.Add(new NDT.ViewData.Points(curN, mathExpSum / (float)m_data.iterAmount));
+                    viewDatas[1].pointsList.Add(new NDT.ViewData.Points(curN, mainCompSum / (float)m_data.iterAmount));
 
 
                     UIController.m_progressBarFillRate = Mathf.InverseLerp(m_data.n_start, m_data.n_end, curN);
+                    //Debug.Log("curN: " + curN);
                 }
 
                 return viewDatas;
@@ -81,6 +89,7 @@ namespace lab3
             GameEvents.OnChangeAuxParamsView?.Invoke(UIController.curParamsValuesCount, m_data);
 
             GameEvents.OnBuildView?.Invoke(viewDatas[0]);
+            GameEvents.OnBuildView?.Invoke(viewDatas[1]);
 
             GameEvents.OnChangeUIStateAux?.Invoke(UIController.UIStateAux.Green);
 

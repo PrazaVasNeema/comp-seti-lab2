@@ -135,7 +135,7 @@ namespace lab3
                         // Создаем стрелку
                         GameObject arrowObject = Instantiate(arrowPrefab, end, Quaternion.identity);
                         Vector3 direction = (end - start).normalized;
-                        arrowObject.transform.position = end - direction * .5f; // Смещение стрелки немного назад
+                        arrowObject.transform.position = end - direction * .25f; // Смещение стрелки немного назад
                         //arrowObject.transform.rotation = Quaternion.LookRotation(arrowObject.transform.forward, direction);
                         arrowObject.transform.LookAt(end);
                         arrowObjects.Add(arrowObject);
@@ -158,10 +158,10 @@ namespace lab3
                 radiusRenderer.widthMultiplier = 0.05f * zoom / 25;
             }
 
-
+            var test = basePointSize * 5 / 25;
             foreach (var arrowObject in arrowObjects)
             {
-                arrowObject.transform.localScale = Vector3.one * scaleFactor * 20;
+                arrowObject.transform.localScale = Vector3.one * test * 20;
             }
 
             foreach (var arrowRenderer in arrowRenderers)
