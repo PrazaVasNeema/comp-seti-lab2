@@ -8,7 +8,7 @@ public class CameraController : MonoBehaviour
     public float maxZoom = 20;
 
     [SerializeField] private Camera m_camera;
-    public ParabolaAndPointsVisualizer visualizer; // Ссылка на визуализатор
+    public lab3.Visualizations visualizer; // Ссылка на визуализатор
 
     private Vector3 dragOrigin;
 

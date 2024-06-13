@@ -32,12 +32,15 @@ namespace lab3
 
         private void OnChangeAuxParamsView(int arg1, Lab3DataSO.Data arg2)
         {
+            Debug.Log(arg1);
             if (arg1 == thisNum)
             {
                 paramsThemselvesGO.SetActive(true);
 
                 r_min.text = arg2.r_min.ToString();
                 r_max.text = arg2.r_max.ToString();
+                UIController.curParamsValuesCount++;
+
             }
         }
 

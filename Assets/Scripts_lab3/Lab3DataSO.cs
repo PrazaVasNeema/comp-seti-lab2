@@ -5,7 +5,7 @@ using UnityEngine;
 namespace lab3
 {
 
-    [CreateAssetMenu(fileName = "Lab1DataSO", menuName = "Lab1/Lab1DataSO")]
+    [CreateAssetMenu(fileName = "Lab3DataSO", menuName = "Lab3/Lab3DataSO")]
     public class Lab3DataSO : ScriptableObject
     {
 
@@ -17,14 +17,16 @@ namespace lab3
         {
 
             [Header("Gauss (распределение точек на плоскости)")]
-            public float mean;
-            public float std_dev;
+            public float meanX;
+            public float stdDevX;
+            public float meanY;
+            public float stdDevY;
             [Header("R[a, b] (Радиус)")]
             public float r_min;
             public float r_max;
             [Header("Вершины")]
-            public float n_start;
-            public float n_end;
+            public int n_start;
+            public int n_end;
             [Header("Количество шагов (зависит от отрезка значений вершин)")]
             public int n_stepCount;
 

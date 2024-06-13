@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6cf8ed98e732a724993d4aecbb557d16, type: 3}
+  m_Name: Lab3DataSO
+  m_EditorClassIdentifier: 
+  m_data:
+    meanX: 0
+    stdDevX: 10
+    meanY: 50
+    stdDevY: 20
+    r_min: 0.5
+    r_max: 10
+    n_start: 0
+    n_end: 100
+    n_stepCount: 100
+    iterAmount: 100

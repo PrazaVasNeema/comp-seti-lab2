@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace lab3
 {
@@ -20,8 +21,24 @@ namespace lab3
         [SerializeField] private GameObject m_greyAux;
         [SerializeField] private GameObject m_redAux;
 
-        [SerializeField] private GameObject m_charts;
 
+        // Progress Bar
+        [SerializeField] private GameObject m_progressBarGO;
+        [SerializeField] private Image m_progressBar;
+        public static float m_progressBarFillRate { get; set; }
+
+        public void Start()
+        {
+            curParamsValuesCount = 0;
+        }
+
+        private void Update()
+        {
+            if (Time.frameCount % 10 == 0)
+            {
+                m_progressBar.fillAmount = m_progressBarFillRate;
+            }
+        }
 
         public void OnEnable()
         {
@@ -57,6 +74,8 @@ namespace lab3
             {
                 chart.RemoveViewData();
             }
+
+            OnClearAuxParamsView();
         }
 
         // Aux
@@ -92,7 +111,6 @@ namespace lab3
 
         [SerializeField] private GameObject m_ui3D;
         [SerializeField] private GameObject m_canvas;
-        [SerializeField] private ViewOverseer m_ViewOverseer;
 
         public void Set3DView()
         {
@@ -112,7 +130,6 @@ namespace lab3
         {
             m_canvas.SetActive(true);
 
-            m_ViewOverseer.OnUpdateNodeDataCoreLogic(index);
         }
 
         // Params
@@ -121,7 +138,7 @@ namespace lab3
 
         public void OnClearAuxParamsView()
         {
-            for (int i = curParamsValuesCount; i > 0; i--)
+            for (int i = curParamsValuesCount; i >= 0; i--)
             {
                 GameEvents.OnClearAuxParamsView?.Invoke(i);
             }

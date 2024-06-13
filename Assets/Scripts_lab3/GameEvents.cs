@@ -13,6 +13,7 @@ namespace lab3
         // Charts
         public static System.Action<NDT.ViewData> OnBuildView;
         public static System.Action OnClearViewData;
+        //public static System.Action<List<NDT.ViewData>> OnBuildAllViews;
 
         // Aux
         public static System.Action OnClearAllAuxParams;

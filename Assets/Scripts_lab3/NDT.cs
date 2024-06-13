@@ -7,6 +7,18 @@ namespace lab3
 {
     public class NDT
     {
+        public class PointData
+        {
+            public Vector2 position;
+            public float radius;
+
+            public PointData(Vector2 position, float radius)
+            {
+                this.position = position;
+                this.radius = radius;
+            }
+        }
+
         public enum TargetView
         {
             MathExp,
