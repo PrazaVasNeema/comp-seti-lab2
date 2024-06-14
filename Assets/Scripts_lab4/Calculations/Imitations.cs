@@ -16,6 +16,7 @@ namespace lab4
         private Lab4DataSO.Data m_data => m_lab4DataSO.data;
         private Calculations m_calculations;
         private Analyzations m_analyzations = new Analyzations();
+        private ProcessDensityX m_processDensityX = new ProcessDensityX();
 
         private CancellationTokenSource cancelTokenSource;
 
@@ -74,7 +75,7 @@ namespace lab4
             SetIndependantValue(m_data.start);
 
 
-
+            m_processDensityX.ClearData();
 
             viewDatas = await Task.Run(() =>
             {
@@ -125,10 +126,21 @@ namespace lab4
                         mainCompSum += iterScalemainCompSum / pointDataInTimeDict.Count;
                         //Debug.Log("dict count:" + pointDataInTimeDict.Count);
 
+                        if (expIndValue == m_data.start)
+                        {
+                            m_processDensityX.CloneDictAndAdd(pointDataInTimeDict);
+                        }
+
                     }
+
 
                     viewDatas[0].pointsList.Add(new NDT.ViewData.Points(expIndValue, mathExpSum / (float)m_data.iterAmount));
                     viewDatas[1].pointsList.Add(new NDT.ViewData.Points(expIndValue, mainCompSum / (float)m_data.iterAmount));
+
+                    if (expIndValue == m_data.start)
+                    {
+                        viewDatas.Add(m_processDensityX.GetViewData());
+                    }
 
 
                     UIController.m_progressBarFillRate = Mathf.InverseLerp(m_data.start, m_data.end, expIndValue);
@@ -144,8 +156,9 @@ namespace lab4
 
             GameEvents.OnBuildView?.Invoke(viewDatas[0]);
             GameEvents.OnBuildView?.Invoke(viewDatas[1]);
+            GameEvents.OnBuildView?.Invoke(viewDatas[2]);
 
-            
+
 
             GameEvents.OnChangeUIStateAux?.Invoke(UIController.UIStateAux.Green);
 

@@ -18,14 +18,14 @@ MonoBehaviour:
     meanY: 50
     stdDevY: 20
     r_min: 0.5
-    r_max: 1
+    r_max: 20
     n_count: 20
     p_t: 1
     p_v: 1
     independant: 1
-    start: 1
-    end: 100
-    step: 10
+    start: 3
+    end: 10
+    step: 5
     timePerIter: 10
     deltaTime: 1
-    iterAmount: 100
+    iterAmount: 1000

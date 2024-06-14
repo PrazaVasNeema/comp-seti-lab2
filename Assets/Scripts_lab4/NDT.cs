@@ -12,7 +12,8 @@ namespace lab4
         {
             MathExp,
             MainCompVertComp,
-            density
+            densityX,
+            densityY,
         }
 
         public class ViewData
