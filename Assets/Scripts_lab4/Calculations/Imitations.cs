@@ -5,13 +5,14 @@ using UnityEngine;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEditor.U2D.Aseprite;
+using lab3;
 
 namespace lab4
 {
     public class Imitations : MonoBehaviour
     {
         [SerializeField] private Lab4DataSO m_lab4DataSO;
-        //[SerializeField] private Visualizations m_visualizations;
+        [SerializeField] private Visualizations m_visualizations;
         private Lab4DataSO.Data m_data => m_lab4DataSO.data;
         private Calculations m_calculations;
         private Analyzations m_analyzations = new Analyzations();
@@ -25,7 +26,9 @@ namespace lab4
 
         public async void Imitate()
         {
-            //m_visualizations.Clear();
+            PointData.SetStaticPParams(m_data.p_t, m_data.p_v);
+
+            m_visualizations.Clear();
             m_calculations = new Calculations(m_data.meanX, m_data.stdDevX, m_data.meanY, m_data.stdDevY, m_data.r_min, m_data.r_max);
 
             NDT.ViewData mathExpViewData = new NDT.ViewData(NDT.TargetView.MathExp);
@@ -44,8 +47,20 @@ namespace lab4
 
             //int step = (int)((m_data.n_end - m_data.n_start) / m_data.n_stepCount) > 0 ? (int)((m_data.n_end - m_data.n_start) / m_data.n_stepCount) : 1;
             //Debug.Log("Step:" + step);
+            int[,] adjacencyMatrix = new int[m_data.n_count, m_data.n_count];
+            //var test = m_calculations.GeneratePointsBelowParabola(m_data.n_count);
+
+            //m_visualizations.DrawParabola();
+            //m_visualizations.VisualizePoints(test);
+
+
+
+            //return;
 
             GameEvents.OnChangeUIStateAux?.Invoke(UIController.UIStateAux.Grey);
+
+
+
 
 
             List<NDT.ViewData> viewDatas = new List<NDT.ViewData>();
@@ -58,7 +73,8 @@ namespace lab4
 
             SetIndependantValue(m_data.start);
 
-            int[,] adjacencyMatrix = new int[m_data.n_count, m_data.n_count];
+
+
 
             viewDatas = await Task.Run(() =>
             {
@@ -67,6 +83,8 @@ namespace lab4
                 {
                     mathExpSum = 0f;
                     mainCompSum = 0f;
+
+                    SetPointDataIndependantValue(expIndValue);
 
                     for (int iter = 0; iter < m_data.iterAmount; iter++)
                     {
@@ -105,7 +123,7 @@ namespace lab4
                         }
                         mathExpSum += iterScaleMathExpSum / pointDataInTimeDict.Count;
                         mainCompSum += iterScalemainCompSum / pointDataInTimeDict.Count;
-                        Debug.Log("dict count:" + pointDataInTimeDict.Count);
+                        //Debug.Log("dict count:" + pointDataInTimeDict.Count);
 
                     }
 
@@ -177,6 +195,23 @@ namespace lab4
                 case Lab4DataSO.Data.Independant.P_v:
                     {
                         m_data.p_v = newValue;
+                        break;
+                    }
+            }
+        }
+
+        private void SetPointDataIndependantValue(float newValue)
+        {
+            switch (m_data.independant)
+            {
+                case Lab4DataSO.Data.Independant.P_t:
+                    {
+                        PointData.SetStaticPParams(newValue, m_data.p_v);
+                        break;
+                    }
+                case Lab4DataSO.Data.Independant.P_v:
+                    {
+                        PointData.SetStaticPParams(m_data.p_t, newValue);
                         break;
                     }
             }

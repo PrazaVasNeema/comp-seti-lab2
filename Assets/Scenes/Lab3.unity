@@ -40164,6 +40164,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_lab4DataSO: {fileID: 11400000, guid: 393921467a616f548bf584b0d5cf86d7, type: 2}
+  m_visualizations: {fileID: 1461817789}
 --- !u!4 &979876798
 Transform:
   m_ObjectHideFlags: 0
@@ -61900,33 +61901,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1461817788}
-  - component: {fileID: 1461817787}
+  - component: {fileID: 1461817789}
   m_Layer: 0
   m_Name: Visualizations
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!114 &1461817787
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1461817786}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2674608947e14604b99f999598e54d6f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  resolution: 100
-  xMin: -10
-  xMax: 10
-  lineRenderer: {fileID: 0}
-  pointPrefab: {fileID: 4855160169147087116}
-  basePointSize: 1
-  arrowPrefab: {fileID: 1046328436803271414, guid: e8224da71913b0d4587bb7d03a1130f0, type: 3}
+  m_IsActive: 1
 --- !u!4 &1461817788
 Transform:
   m_ObjectHideFlags: 0
@@ -61942,6 +61924,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1461817789
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1461817786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de616100acf9d214ba0384c64fedf042, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  resolution: 100
+  xMin: -10
+  xMax: 10
+  lineRenderer: {fileID: 0}
+  pointPrefab: {fileID: 4855160169147087116}
+  basePointSize: 1
+  arrowPrefab: {fileID: 1843204161}
 --- !u!1 &1462350955
 GameObject:
   m_ObjectHideFlags: 1
@@ -75146,6 +75147,11 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1843204161 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5232178718655442665, guid: 0c66b6628ae27e7469a92c145f6a70cc, type: 3}
+  m_PrefabInstance: {fileID: 268252128596564061}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1844377288
 GameObject:
   m_ObjectHideFlags: 0

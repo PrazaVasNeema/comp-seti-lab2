@@ -105,6 +105,33 @@ namespace lab4
                 direction = new Vector2(p_v * Mathf.Cos(currentTime), p_v * Mathf.Sin(currentTime));
             }
         }
+
+
+        public Vector2 Test(float newTime)
+        {
+            float deltaTime = newTime - currentTime;
+            currentTime = newTime;
+
+            Debug.Log("deltaTime:" + deltaTime);
+
+            if (remainingTime > 0)
+            {
+                remainingTime -= deltaTime;
+                Move(deltaTime);
+            }
+            else
+            {
+                ChooseNewPattern();
+            }
+
+            // Проверка на выход за границы параболы
+            if (position.y > -Mathf.Pow(position.x, 2) + 100)
+            {
+                position.y = -Mathf.Pow(position.x, 2) + 100;
+            }
+
+            return position;
+        }
     }
 
 }
