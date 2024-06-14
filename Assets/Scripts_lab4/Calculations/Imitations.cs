@@ -50,10 +50,10 @@ namespace lab4
             //int step = (int)((m_data.n_end - m_data.n_start) / m_data.n_stepCount) > 0 ? (int)((m_data.n_end - m_data.n_start) / m_data.n_stepCount) : 1;
             //Debug.Log("Step:" + step);
             int[,] adjacencyMatrix = new int[m_data.n_count, m_data.n_count];
-            //var test = m_calculations.GeneratePointsBelowParabola(m_data.n_count);
+            var test = m_calculations.GeneratePointsBelowParabola(m_data.n_count);
 
-            //m_visualizations.DrawParabola();
-            //m_visualizations.VisualizePoints(test);
+            m_visualizations.DrawParabola();
+            m_visualizations.VisualizePoints(test, false);
 
 
 

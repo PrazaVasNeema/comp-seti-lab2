@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Net;
 using UnityEngine;
 
 namespace lab4
@@ -74,7 +75,7 @@ namespace lab4
             float deltaTime = newTime - newPoint.currentTime;
             newPoint.currentTime = newTime;
 
-
+            Vector2 oldPosition = oldPoint.position;
 
             if (newPoint.remainingTime > 0)
             {
@@ -89,11 +90,13 @@ namespace lab4
             // Проверка на выход за границы параболы
             if (newPoint.position.y > -Mathf.Pow(newPoint.position.x, 2) + 100)
             {
-                newPoint.position.y = -Mathf.Pow(newPoint.position.x, 2) + 100;
+                newPoint.position.x = oldPosition.x;
+                newPoint.position.y = oldPosition.y;
             }
 
             return newPoint;
         }
+
 
         private void Move(float deltaTime)
         {
@@ -113,6 +116,7 @@ namespace lab4
             currentTime = newTime;
 
             Debug.Log("deltaTime:" + deltaTime);
+            Vector2 oldPosition = position;
 
             if (remainingTime > 0)
             {
@@ -127,7 +131,8 @@ namespace lab4
             // Проверка на выход за границы параболы
             if (position.y > -Mathf.Pow(position.x, 2) + 100)
             {
-                position.y = -Mathf.Pow(position.x, 2) + 100;
+                position.x = oldPosition.x;
+                position.y = oldPosition.y;
             }
 
             return position;

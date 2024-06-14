@@ -92,7 +92,7 @@ namespace lab4
             lineRenderer.SetPositions(points);
         }
 
-        public void VisualizePoints(List<PointData> points)
+        public void VisualizePoints(List<PointData> points, bool withRadius = true)
         {
             pointDataList = points;
             foreach (var point in points)
@@ -101,28 +101,39 @@ namespace lab4
                 pointObject.transform.localScale = Vector3.one * basePointSize;
                 pointObjects.Add(pointObject);
 
-                // Создаем LineRenderer для визуализации радиуса
-                GameObject radiusObject = new GameObject("Radius");
-                radiusObject.transform.position = new Vector3(point.position.x, point.position.y, 0);
-                LineRenderer radiusRenderer = radiusObject.AddComponent<LineRenderer>();
-                radiusRenderer.positionCount = 100;
-                radiusRenderer.widthMultiplier = 0.05f;
-                radiusRenderer.material = new Material(Shader.Find("Sprites/Default"));
-                radiusRenderer.startColor = Color.blue;
-                radiusRenderer.endColor = Color.blue;
-
-                // Устанавливаем точки для LineRenderer
-                Vector3[] radiusPoints = new Vector3[100];
-                for (int i = 0; i < 100; i++)
+                if (withRadius)
                 {
-                    float angle = i * Mathf.PI * 2 / 100;
-                    float x = Mathf.Cos(angle) * point.radius;
-                    float y = Mathf.Sin(angle) * point.radius;
-                    radiusPoints[i] = new Vector3(x, y, 0) + new Vector3(point.position.x, point.position.y, 0);
-                }
-                radiusRenderer.SetPositions(radiusPoints);
+                    // Создаем LineRenderer для визуализации радиуса
+                    GameObject radiusObject = new GameObject("Radius");
+                    radiusObject.transform.position = new Vector3(point.position.x, point.position.y, 0);
+                    LineRenderer radiusRenderer = radiusObject.AddComponent<LineRenderer>();
+                    radiusRenderer.positionCount = 100;
+                    radiusRenderer.widthMultiplier = 0.05f;
+                    radiusRenderer.material = new Material(Shader.Find("Sprites/Default"));
+                    radiusRenderer.startColor = Color.blue;
+                    radiusRenderer.endColor = Color.blue;
 
-                radiusRenderers.Add(radiusRenderer);
+                    // Устанавливаем точки для LineRenderer
+                    Vector3[] radiusPoints = new Vector3[100];
+                    for (int i = 0; i < 100; i++)
+                    {
+                        float angle = i * Mathf.PI * 2 / 100;
+                        float x = Mathf.Cos(angle) * point.radius;
+                        float y = Mathf.Sin(angle) * point.radius;
+                        radiusPoints[i] = new Vector3(x, y, 0) + new Vector3(point.position.x, point.position.y, 0);
+                    }
+                    radiusRenderer.SetPositions(radiusPoints);
+
+                    radiusRenderers.Add(radiusRenderer);
+                }
+
+                TrailRenderer trail = pointObject.AddComponent<TrailRenderer>();
+                trail.time = 10.0f; // Время жизни следа
+                trail.startWidth = 0.1f;
+                trail.endWidth = 0.0f;
+                trail.material = new Material(Shader.Find("Sprites/Default")); // Установите материал для следа
+                trail.startColor = Color.blue;
+                trail.endColor = Color.clear;
             }
         }
 
