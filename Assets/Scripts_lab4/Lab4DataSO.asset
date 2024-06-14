@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6cf8ed98e732a724993d4aecbb557d16, type: 3}
-  m_Name: Lab3DataSO
+  m_Script: {fileID: 11500000, guid: f20ccb39b74e9c1419fde61b3425d166, type: 3}
+  m_Name: Lab4DataSO
   m_EditorClassIdentifier: 
   m_data:
     meanX: 0
@@ -18,8 +18,14 @@ MonoBehaviour:
     meanY: 50
     stdDevY: 20
     r_min: 0.5
-    r_max: 7
-    n_start: 1
-    n_end: 60
-    n_stepCount: 59
-    iterAmount: 1000
+    r_max: 1
+    n_count: 20
+    p_t: 1
+    p_v: 1
+    independant: 1
+    start: 1
+    end: 100
+    step: 10
+    timePerIter: 10
+    deltaTime: 1
+    iterAmount: 100
