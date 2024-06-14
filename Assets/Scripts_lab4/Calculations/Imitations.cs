@@ -17,6 +17,7 @@ namespace lab4
         private Calculations m_calculations;
         private Analyzations m_analyzations = new Analyzations();
         private ProcessDensityX m_processDensityX = new ProcessDensityX();
+        private ProcessDensityY m_processDensityY = new ProcessDensityY();
 
         private CancellationTokenSource cancelTokenSource;
 
@@ -76,6 +77,7 @@ namespace lab4
 
 
             m_processDensityX.ClearData();
+            m_processDensityY.ClearData();
 
             viewDatas = await Task.Run(() =>
             {
@@ -129,6 +131,7 @@ namespace lab4
                         if (expIndValue == m_data.start)
                         {
                             m_processDensityX.CloneDictAndAdd(pointDataInTimeDict);
+                            m_processDensityY.CloneDictAndAdd(pointDataInTimeDict);
                         }
 
                     }
@@ -140,6 +143,7 @@ namespace lab4
                     if (expIndValue == m_data.start)
                     {
                         viewDatas.Add(m_processDensityX.GetViewData());
+                        viewDatas.Add(m_processDensityY.GetViewData());
                     }
 
 
@@ -157,6 +161,7 @@ namespace lab4
             GameEvents.OnBuildView?.Invoke(viewDatas[0]);
             GameEvents.OnBuildView?.Invoke(viewDatas[1]);
             GameEvents.OnBuildView?.Invoke(viewDatas[2]);
+            GameEvents.OnBuildView?.Invoke(viewDatas[3]);
 
 
 
